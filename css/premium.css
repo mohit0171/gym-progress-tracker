@@ -1,0 +1,162 @@
+/* Premium athletic theme — layered over base style.css. Preserves all IDs/classes. */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap");
+body {
+  font-family: var(--font);
+  background:
+    radial-gradient(
+      1100px 420px at 18% -80px,
+      rgba(183, 243, 107, 0.07),
+      transparent 60%
+    ),
+    var(--bg);
+  letter-spacing: -0.01em;
+}
+.content {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+.card {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent 30%),
+    var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow-sm);
+  transition:
+    border-color 0.2s var(--ease),
+    transform 0.2s var(--ease),
+    box-shadow 0.2s var(--ease);
+}
+.card:hover {
+  border-color: #2e372f;
+}
+.card-title {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.card-sub {
+  font-size: 13px;
+  color: var(--muted);
+}
+.btn {
+  min-height: 44px;
+  border-radius: 12px;
+  font-weight: 700;
+  transition:
+    transform 0.08s var(--ease),
+    background 0.18s,
+    border-color 0.18s,
+    box-shadow 0.18s;
+}
+.btn:active {
+  transform: translateY(1px) scale(0.99);
+}
+.btn-primary {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: transparent;
+  box-shadow: 0 6px 18px rgba(183, 243, 107, 0.18);
+}
+.btn-primary:hover {
+  filter: brightness(1.06);
+}
+.btn-ghost {
+  border-color: var(--border);
+}
+.icon-btn {
+  min-width: 40px;
+  min-height: 40px;
+  border-radius: 11px;
+}
+input,
+select,
+textarea {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  min-height: 44px;
+}
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.topbar {
+  background: rgba(11, 13, 12, 0.82);
+}
+.brand-mark {
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 800;
+}
+.nav-link {
+  border-radius: 12px;
+  font-weight: 600;
+}
+.nav-link.active {
+  background: var(--accent-soft);
+  color: var(--text);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+.nav-link.active i,
+.nav-link.active svg {
+  color: var(--accent);
+}
+.stat-card {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 40%),
+    var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+}
+.stat-icon {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.badge {
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  border-radius: 999px;
+}
+.list-item {
+  border: 1px solid var(--border-soft);
+  border-radius: 14px;
+  background: var(--bg-elev);
+}
+.empty-state {
+  border: 1px dashed var(--border);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.015);
+}
+.chart-box {
+  position: relative;
+}
+.skel {
+  border-radius: 12px;
+  background: linear-gradient(
+    90deg,
+    var(--surface-2) 25%,
+    var(--surface-3) 50%,
+    var(--surface-2) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.2s linear infinite;
+  min-height: 56px;
+}
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* ---- Light theme adjustments (overrides hardcoded dark values above) ---- */
+:root[data-theme="light"] .card:hover {
+  border-color: #B7C2B3;
+}
+:root[data-theme="light"] .topbar {
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+}

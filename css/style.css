@@ -3,41 +3,60 @@
    ========================================================================== */
 
 :root {
-  --bg: #121315;
-  --surface: #1c1e21;
-  --surface-2: #26292e;
-  --border: #33373e;
-  --text: #ffffff;
-  --muted: #9aa1ab;
-  --accent: #39ff88;
-  --accent-ink: #07130c;
-  --accent-soft: rgba(57, 255, 136, 0.12);
-  --danger: #ff5c6c;
-  --warn: #ffc857;
-  --info: #5fb8ff;
+  --bg: #0B0D0C;
+  --bg-elev: #0E110F;
+  --surface: #151916;
+  --surface-2: #1C211D;
+  --surface-3: #232A23;
+  --border: #242B25;
+  --border-soft: #1E2420;
+  --text: #FFFFFF;
+  --muted: #9AA39B;
+  --muted-2: #6E7770;
+  --accent: #B7F36B;
+  --accent-ink: #0C1206;
+  --accent-soft: rgba(183, 243, 107, 0.11);
+  --accent-line: rgba(183, 243, 107, 0.32);
+  --danger: #F26D6D;
+  --warn: #E8C86A;
+  --info: #7FB8E8;
+  --chart-2: #7FB8E8;
+  --chart-3: #E8C86A;
   --radius: 16px;
-  --radius-sm: 10px;
-  --shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
-  --sidebar-w: 248px;
+  --radius-sm: 12px;
+  --radius-xs: 10px;
+  --shadow: 0 10px 28px rgba(0, 0, 0, 0.32);
+  --shadow-sm: 0 4px 14px rgba(0, 0, 0, 0.28);
+  --sidebar-w: 260px;
+  --sidebar-w-collapsed: 84px;
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --font: "Manrope", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   color-scheme: dark;
 }
 
 /* Light mode, applied with the theme toggle */
 :root[data-theme="light"] {
-  --bg: #f2f4f7;
-  --surface: #ffffff;
-  --surface-2: #eef1f5;
-  --border: #dde2ea;
-  --text: #111317;
-  --muted: #5b6470;
-  --accent: #14a64f;
-  --accent-ink: #ffffff;
-  --accent-soft: rgba(20, 166, 79, 0.12);
-  --danger: #d62f45;
-  --warn: #b7791f;
-  --info: #2b7bd6;
-  --shadow: 0 8px 24px rgba(20, 25, 35, 0.08);
+  --bg: #F3F5F2;
+  --bg-elev: #FFFFFF;
+  --surface: #FFFFFF;
+  --surface-2: #EEF2EC;
+  --surface-3: #E4EAE1;
+  --border: #DCE3DA;
+  --border-soft: #E7EEE5;
+  --text: #111512;
+  --muted: #5C665D;
+  --muted-2: #8A938B;
+  --accent: #4E7A1E;
+  --accent-ink: #FFFFFF;
+  --accent-soft: rgba(78, 122, 30, 0.12);
+  --accent-line: rgba(78, 122, 30, 0.32);
+  --danger: #C93A45;
+  --warn: #9A6F1A;
+  --info: #2B6CB0;
+  --chart-2: #2B6CB0;
+  --chart-3: #9A6F1A;
+  --shadow: 0 8px 24px rgba(20, 25, 22, 0.08);
+  --shadow-sm: 0 2px 10px rgba(20,25,22,0.07);
   color-scheme: light;
 }
 
