@@ -146,9 +146,14 @@
   }
 
   function renderChart(entries) {
-    const key = $('metricSelect').value || 'weight';
+    const key = ($('metricSelect') && $('metricSelect').value) || 'weight';
     const metric = metricOf(key);
-    const vals = valuesOf(entries, key);
+    const range = ($('rangeSelect') && $('rangeSelect').value) || '90';
+    let vals = valuesOf(entries, key);
+    if (range !== 'all') {
+      const cutoff = App.addDays(Store.todayISO(), -Number(range));
+      vals = vals.filter(e => e.date >= cutoff);
+    }
     App.drawChart('progressChartBox', 'progress', vals.length > 0, theme => ({
       type: 'line',
       data: {
@@ -167,6 +172,28 @@
       options: App.chartOptions(theme, false)
     }), App.emptyState('trending-up', 'No ' + metric.label.toLowerCase() + ' data yet',
       'Save an entry with this measurement to see the trend.'));
+    // Frequency: completed workouts per week (actual stored data)
+    const sessions = Store.load().sessions.filter(s => s.status === 'completed');
+    let freq = sessions;
+    if (range !== 'all') {
+      const cutoff = App.addDays(Store.todayISO(), -Number(range));
+      freq = freq.filter(s => s.date >= cutoff);
+    }
+    const buckets = {};
+    freq.forEach(s => {
+      const d = App.parseISO(s.date);
+      const monday = App.toISO(new Date(d.getFullYear(), d.getMonth(), d.getDate() - ((d.getDay() + 6) % 7)));
+      buckets[monday] = (buckets[monday] || 0) + 1;
+    });
+    const labels = Object.keys(buckets).sort();
+    App.drawChart('frequencyChartBox', 'frequency', labels.length > 0, theme => ({
+      type: 'bar',
+      data: {
+        labels: labels.map(l => App.formatDate(l, { month: 'short', day: 'numeric' })),
+        datasets: [{ label: 'Workouts / week', data: labels.map(l => buckets[l]), backgroundColor: theme.second, borderRadius: 8, maxBarThickness: 34 }]
+      },
+      options: App.chartOptions(theme, true)
+    }), App.emptyState('chart-column', 'No frequency data', 'Complete a workout to see weekly frequency.'));
   }
 
   function fillMetricSelect() {
@@ -180,6 +207,7 @@
     $('measureForm').addEventListener('submit', onSubmit);
     $('mCancel').addEventListener('click', resetForm);
     $('metricSelect').addEventListener('change', () => App.refresh());
+    if ($('rangeSelect')) $('rangeSelect').addEventListener('change', () => App.refresh());
     $('historyBody').addEventListener('click', e => {
       const edit = e.target.closest('[data-edit]');
       const del = e.target.closest('[data-delete]');

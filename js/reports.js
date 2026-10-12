@@ -174,12 +174,14 @@
     const id = $('exerciseSelect').value;
     if (!id) {
       box.innerHTML = App.emptyState('dumbbell', 'No exercise history', 'Complete a workout to see performance history here.');
+      App.drawChart('strengthChartBox', 'strength', false, null, '');
       App.icons();
       return;
     }
-    const rows = data.sessions
+    const sessions = data.sessions
       .filter(s => s.status === 'completed' && s.exercises.some(e => e.exerciseId === id))
-      .sort((a, b) => b.date.localeCompare(a.date))
+      .sort((a, b) => a.date.localeCompare(b.date));
+    const rows = sessions.slice().reverse()
       .map(s => {
         const ex = s.exercises.find(e => e.exerciseId === id);
         const recorded = ex.sets.filter(App.isRecorded);
@@ -191,6 +193,31 @@
           '<td>' + App.fmt(Math.round(volume), 0) + ' kg</td></tr>';
       }).join('');
     box.innerHTML = '<table class="data-table"><thead><tr><th>Date</th><th>Best set</th><th>Sets</th><th>Volume</th></tr></thead><tbody>' + rows + '</tbody></table>';
+    // Strength progression chart from actual best-set data
+    const pts = sessions.map(s => {
+      const ex = s.exercises.find(e => e.exerciseId === id);
+      const recorded = ex.sets.filter(App.isRecorded);
+      if (!recorded.length) return null;
+      const best = recorded.reduce((a, b) => ((b.weight || 0) > (a.weight || 0) ? b : a));
+      return { date: s.date, weight: best.weight || 0 };
+    }).filter(Boolean);
+    App.drawChart('strengthChartBox', 'strength', pts.length > 0, theme => ({
+      type: 'line',
+      data: {
+        labels: pts.map(p => App.formatDate(p.date, { month: 'short', day: 'numeric' })),
+        datasets: [{
+          label: 'Best weight (kg)',
+          data: pts.map(p => p.weight),
+          borderColor: theme.accent,
+          backgroundColor: theme.accentSoft,
+          fill: true,
+          tension: 0.35,
+          pointRadius: 4,
+          pointBackgroundColor: theme.accent
+        }]
+      },
+      options: App.chartOptions(theme, false)
+    }), App.emptyState('trending-up', 'No strength data', 'Log sets with weight to see progression.'));
   }
 
   function onExport() {

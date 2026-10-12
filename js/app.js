@@ -192,12 +192,13 @@
 
     if (sidebar) {
       sidebar.innerHTML =
-        '<div class="brand"><div class="brand-mark"><i data-lucide="dumbbell"></i></div><span>GymProgress</span></div>' +
+        '<div class="brand"><div class="brand-mark"><i data-lucide="dumbbell"></i></div><span class="brand-text">GymProgress</span>' +
+        '<button class="icon-btn sidebar-collapse-btn" id="collapseBtn" aria-label="Collapse sidebar"><i data-lucide="chevrons-left"></i></button></div>' +
         '<nav class="nav" aria-label="Main navigation">' +
         App.NAV.map(item => {
           const active = item.page === page;
           return '<a class="nav-link' + (active ? ' active' : '') + '" href="' + item.href + '"' +
-            (active ? ' aria-current="page"' : '') + '><i data-lucide="' + item.icon + '"></i><span>' + item.label + '</span></a>';
+            (active ? ' aria-current="page"' : '') + ' title="' + App.esc(item.label) + '"><i data-lucide="' + item.icon + '"></i><span class="nav-label">' + item.label + '</span></a>';
         }).join('') +
         '</nav>' +
         '<p class="sidebar-foot">Your data is saved only in this browser. It does not sync across devices.</p>';
@@ -210,6 +211,32 @@
         '<h1 class="page-title">' + App.esc(title) + '</h1>' +
         '</div>' +
         '<div class="topbar-right"><button class="icon-btn" id="themeBtn" aria-label="Toggle light or dark mode"></button></div>';
+    }
+
+    // Mobile bottom navigation (Dashboard, Workouts, Progress, Profile + More menu)
+    if (!document.querySelector('.bottom-nav')) {
+      const tabs = [
+        { page: 'index', href: 'index.html', label: 'Home', icon: 'layout-dashboard' },
+        { page: 'workout-log', href: 'workout-log.html', label: 'Workouts', icon: 'notebook-pen' },
+        { page: 'progress', href: 'progress.html', label: 'Progress', icon: 'trending-up' },
+        { page: 'profile', href: 'profile.html', label: 'Profile', icon: 'user-round' }
+      ];
+      const nav = document.createElement('nav');
+      nav.className = 'bottom-nav';
+      nav.setAttribute('aria-label', 'Mobile navigation');
+      nav.innerHTML = tabs.map(t =>
+        '<a href="' + t.href + '" class="' + (t.page === page ? 'active' : '') + '"' +
+        (t.page === page ? ' aria-current="page"' : '') + '><i data-lucide="' + t.icon + '"></i><span>' + t.label + '</span></a>'
+      ).join('') +
+        '<button type="button" id="moreNavBtn" aria-label="More pages"><i data-lucide="menu"></i><span>More</span></button>';
+      document.body.appendChild(nav);
+      const moreBtn = nav.querySelector('#moreNavBtn');
+      if (moreBtn) moreBtn.addEventListener('click', () => {
+        const sb = document.getElementById('sidebar');
+        const bd = document.getElementById('sidebarBackdrop');
+        if (sb) sb.classList.add('open');
+        if (bd) bd.classList.add('open');
+      });
     }
   };
 
@@ -230,11 +257,23 @@
     });
     if (backdrop) backdrop.addEventListener('click', closeMenu);
     if (themeBtn) themeBtn.addEventListener('click', App.toggleTheme);
+    const collapseBtn = document.getElementById('collapseBtn');
+    if (collapseBtn) collapseBtn.addEventListener('click', () => {
+      const collapsed = document.body.classList.toggle('sidebar-collapsed');
+      try { global.localStorage.setItem('gpt.sidebarCollapsed', collapsed ? '1' : '0'); } catch (e) { /* ignore */ }
+      collapseBtn.innerHTML = '<i data-lucide="' + (collapsed ? 'chevrons-right' : 'chevrons-left') + '"></i>';
+      App.icons();
+    });
+    try {
+      if (global.localStorage.getItem('gpt.sidebarCollapsed') === '1') document.body.classList.add('sidebar-collapsed');
+    } catch (e) { /* ignore */ }
   };
 
   App.applyTheme = function () {
     const theme = Store.getSettings().theme === 'light' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', theme);
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', theme === 'light' ? '#F3F5F2' : '#0B0D0C');
     const btn = document.getElementById('themeBtn');
     if (btn) {
       btn.innerHTML = '<i data-lucide="' + (theme === 'dark' ? 'sun' : 'moon') + '"></i>';
@@ -391,12 +430,19 @@
   App.chartTheme = function () {
     const cs = getComputedStyle(document.documentElement);
     const get = v => cs.getPropertyValue(v).trim();
+    const dark = document.documentElement.getAttribute('data-theme') !== 'light';
     return {
       text: get('--muted'),
       grid: get('--border'),
       accent: get('--accent'),
-      accentSoft: 'rgba(57, 255, 136, 0.18)',
-      info: get('--info')
+      accentSoft: dark ? 'rgba(183, 243, 107, 0.16)' : 'rgba(78, 122, 30, 0.16)',
+      second: get('--chart-2') || get('--info'),
+      third: get('--chart-3') || get('--warn'),
+      info: get('--info'),
+      tooltipBg: dark ? 'rgba(15,18,16,0.96)' : 'rgba(255,255,255,0.97)',
+      tooltipBorder: dark ? 'rgba(183,243,107,0.24)' : 'rgba(78,122,30,0.24)',
+      tooltipTitle: dark ? '#FFFFFF' : '#111512',
+      tooltipBody: dark ? '#D7DCD7' : '#5C665D'
     };
   };
 
@@ -404,10 +450,24 @@
     return {
       responsive: true,
       maintainAspectRatio: false,
-      plugins: { legend: { labels: { color: theme.text } } },
+      animation: { duration: 550, easing: 'easeOutQuart' },
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { labels: { color: theme.text, boxWidth: 12, boxHeight: 12, usePointStyle: true, font: { size: 12, weight: 600 } } },
+        tooltip: {
+          backgroundColor: theme.tooltipBg || 'rgba(15,18,16,0.96)',
+          borderColor: theme.tooltipBorder || 'rgba(183,243,107,0.24)',
+          borderWidth: 1,
+          titleColor: theme.tooltipTitle || '#fff',
+          bodyColor: theme.tooltipBody || '#D7DCD7',
+          padding: 12,
+          cornerRadius: 12,
+          displayColors: true
+        }
+      },
       scales: {
-        x: { ticks: { color: theme.text }, grid: { color: theme.grid } },
-        y: { ticks: { color: theme.text }, grid: { color: theme.grid }, beginAtZero: !!beginAtZero }
+        x: { ticks: { color: theme.text, font: { size: 11 } }, grid: { color: 'transparent' } },
+        y: { ticks: { color: theme.text, font: { size: 11 }, maxTicksLimit: 6 }, grid: { color: theme.grid }, beginAtZero: !!beginAtZero, border: { display: false } }
       }
     };
   };
@@ -422,6 +482,7 @@
     }
     if (!hasData) {
       box.innerHTML = emptyHtml;
+      box.classList.remove('is-loading');
       App.icons();
       return;
     }
@@ -429,9 +490,24 @@
       box.innerHTML = '<p class="muted">The chart library could not load. Check your internet connection and refresh.</p>';
       return;
     }
-    box.innerHTML = '<canvas aria-label="Chart"></canvas>';
+    // Brief skeleton shimmer only while chart canvas is prepared.
+    box.classList.add('is-loading');
+    box.innerHTML = '<div class="skel" style="height:100%;min-height:200px" aria-hidden="true"></div><canvas aria-label="Chart" style="display:none"></canvas>';
     const canvas = box.querySelector('canvas');
-    charts[key] = new global.Chart(canvas, buildConfig(App.chartTheme()));
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        if (!box.isConnected) return;
+        const skel = box.querySelector('.skel');
+        if (skel) skel.remove();
+        canvas.style.display = '';
+        try {
+          charts[key] = new global.Chart(canvas, buildConfig(App.chartTheme()));
+        } catch (err) {
+          box.innerHTML = '<p class="muted">Chart could not be drawn.</p>';
+        }
+        box.classList.remove('is-loading');
+      }, 140);
+    });
   };
 
   /* ---------- Startup ---------- */

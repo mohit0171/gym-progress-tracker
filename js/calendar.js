@@ -76,8 +76,9 @@
       html += '<h4>Scheduled: ' + App.esc(split.label) + '</h4>';
       html += split.exercises.map(pe => {
         const nm = global.GymData ? global.GymData.exerciseById(pe.exerciseId).name : pe.exerciseId;
+        const isCardio = pe.minDuration != null;
         return '<div class="detail-exercise"><span>' + App.esc(nm) + '</span>' +
-          '<span class="muted">' + pe.sets + ' x ' + pe.repMin + '-' + pe.repMax + '</span></div>';
+          '<span class="muted">' + pe.sets + ' x ' + (isCardio ? pe.minDuration + '–' + pe.maxDuration + ' min' : pe.repMin + '-' + pe.repMax) + '</span></div>';
       }).join('');
     } else if (trainDay) {
       html += '<p class="muted">Training day with no saved split. Generate a plan first.</p>';
