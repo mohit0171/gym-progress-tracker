@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Body Progress · Gym Progress Tracker</title>
+  <title>Body Progress Â· Gym Progress Tracker</title>
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#121315" />
   <meta name="description" content="Gym Progress Tracker - workouts, plans, progress and reports. Works offline." />
@@ -16,6 +16,9 @@
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/responsive.css" />
+  <link rel="stylesheet" href="css/premium.css" />
+  <link rel="stylesheet" href="css/premium2.css" />
+  <link rel="stylesheet" href="css/premium3.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
   <script src="https://unpkg.com/lucide@0.383.0/dist/umd/lucide.min.js" defer></script>
 </head>
@@ -61,11 +64,15 @@
             <div class="card-header">
               <div>
                 <h3 class="card-title">Trend</h3>
-                <p class="card-sub">Pick a measurement to chart</p>
+                <p class="card-sub">Pick a measurement and date range</p>
               </div>
-              <select id="metricSelect" style="max-width:200px" aria-label="Measurement to chart"></select>
+            </div>
+            <div class="progress-filters no-print">
+              <div class="field" style="min-width:170px;flex:1"><label for="metricSelect">Measurement</label><select id="metricSelect" aria-label="Measurement to chart"></select></div>
+              <div class="field" style="min-width:150px;flex:1"><label for="rangeSelect">Date range</label><select id="rangeSelect" aria-label="Date range"><option value="30">Last 30 days</option><option value="90" selected>Last 90 days</option><option value="180">Last 6 months</option><option value="365">Last 12 months</option><option value="all">All time</option></select></div>
             </div>
             <div class="chart-box" id="progressChartBox"></div>
+            <div class="chart-box section-gap" id="frequencyChartBox" style="height:210px"></div>
           </div>
         </section>
 
@@ -95,9 +102,10 @@
   </div>
 
   <script src="js/storage.js" defer></script>
-  <script src="js/data.js" defer></script>
+  <script src="js/goal-templates.js"></script>`n  <script src="js/data.js" defer></script>
   <script src="js/app.js" defer></script>
   <script src="js/progress.js" defer></script>
   <script src="js/pwa.js" defer></script>
 </body>
 </html>
+

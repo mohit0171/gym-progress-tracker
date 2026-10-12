@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Dashboard · Gym Progress Tracker</title>
+  <title>Dashboard Â· Gym Progress Tracker</title>
   <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#121315" />
+  <meta name="theme-color" content="#0B0D0C" />
   <meta name="description" content="Gym Progress Tracker - workouts, plans, progress and reports. Works offline." />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -16,6 +16,9 @@
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/responsive.css" />
+  <link rel="stylesheet" href="css/premium.css" />
+  <link rel="stylesheet" href="css/premium2.css" />
+  <link rel="stylesheet" href="css/premium3.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
   <script src="https://unpkg.com/lucide@0.383.0/dist/umd/lucide.min.js" defer></script>
 </head>
@@ -28,9 +31,33 @@
       <header class="topbar" id="topbar"></header>
 
       <main class="content">
-        <section class="page-intro">
-          <h2 id="greeting">Welcome</h2>
-          <p class="muted">Your training snapshot for this month.</p>
+        <section class="hero">
+          <div class="hero-main">
+            <div class="hero-eyebrow" id="todayDate">Today</div>
+            <h2 class="hero-title" id="greeting">Welcome</h2>
+            <p class="hero-sub muted" id="heroSub">Your training snapshot for this month.</p>
+            <div class="hero-cta">
+              <a class="btn btn-primary btn-start" href="workout-log.html"><i data-lucide="play"></i> <span>Start Workout</span></a>
+              <a class="btn btn-ghost" href="workout-plan.html"><i data-lucide="clipboard-list"></i> <span>My Plan</span></a>
+            </div>
+          </div>
+          <div class="hero-side">
+            <div class="mini-profile">
+              <div class="avatar" id="avatarInitial">G</div>
+              <div style="min-width:0">
+                <div style="font-weight:800" id="profileName">Athlete</div>
+                <div class="muted small" id="profileMeta">Set up your profile</div>
+              </div>
+              <span class="streak-pill" style="margin-left:auto" id="streakPill"><i data-lucide="flame"></i> <span>0</span></span>
+            </div>
+            <div class="card" style="padding:14px 16px">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <strong style="font-size:13px">This week</strong>
+                <span class="muted small" id="weekCount">0 workouts</span>
+              </div>
+              <div class="week-bars" id="weekBars" aria-label="Weekly activity"></div>
+            </div>
+          </div>
         </section>
 
         <section class="grid grid-4" id="statCards"></section>
@@ -43,6 +70,7 @@
                 <h3 class="card-title">Recent activity</h3>
                 <p class="card-sub">Latest workouts and measurements</p>
               </div>
+              <a class="btn btn-sm btn-ghost" href="workout-log.html">View all</a>
             </div>
             <div class="list" id="recentList"></div>
           </div>
@@ -62,20 +90,32 @@
             <div class="card-header">
               <div>
                 <h3 class="card-title">Training volume</h3>
-                <p class="card-sub">Last 6 months, kg lifted (weight × reps)</p>
+                <p class="card-sub">Last 6 months, kg lifted (weight Ã— reps)</p>
               </div>
             </div>
             <div class="chart-box" id="volumeChartBox"></div>
           </div>
+        </section>
+
+        <section class="card section-gap">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Monthly consistency</h3>
+              <p class="card-sub">Workout days this month â€” darker green means more volume</p>
+            </div>
+            <a class="btn btn-sm btn-ghost" href="calendar.html">Calendar</a>
+          </div>
+          <div class="heat" id="monthHeat"></div>
         </section>
       </main>
     </div>
   </div>
 
   <script src="js/storage.js" defer></script>
-  <script src="js/data.js" defer></script>
+  <script src="js/goal-templates.js"></script>`n  <script src="js/data.js" defer></script>
   <script src="js/app.js" defer></script>
   <script src="js/dashboard.js" defer></script>
   <script src="js/pwa.js" defer></script>
 </body>
 </html>
+
