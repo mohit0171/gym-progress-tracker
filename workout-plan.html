@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Workout Plan · Gym Progress Tracker</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#121315" />
+  <meta name="description" content="Gym Progress Tracker - workouts, plans, progress and reports. Works offline." />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="GymTracker" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+  <script src="https://unpkg.com/lucide@0.383.0/dist/umd/lucide.min.js" defer></script>
+</head>
+<body data-page="workout-plan" data-title="Workout Plan">
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <div class="main">
+      <header class="topbar" id="topbar"></header>
+
+      <main class="content">
+        <section class="grid grid-main">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Plan builder</h3>
+                <p class="card-sub">Choose a goal, training days and experience level, then generate a split.</p>
+              </div>
+            </div>
+
+            <form id="planForm" novalidate>
+              <div class="form-grid">
+                <div class="field">
+                  <label for="goal">Fitness goal</label>
+                  <select id="goal"></select>
+                </div>
+                <div class="field">
+                  <label for="days">Training days per week</label>
+                  <select id="days">
+                    <option value="3">3 days</option>
+                    <option value="4">4 days</option>
+                    <option value="5">5 days</option>
+                    <option value="6">6 days</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="experience">Experience level</label>
+                  <select id="experience"></select>
+                </div>
+              </div>
+
+              <div class="field section-gap">
+                <span class="label">Training weekdays (choose exactly your days per week)</span>
+                <div class="check-grid" id="dayChecks"></div>
+                <span class="hint" id="dayHint"></span>
+              </div>
+
+              <div class="btn-row section-gap">
+                <button type="submit" class="btn btn-primary" id="generateBtn"><i data-lucide="sparkles"></i> Generate plan</button>
+                <button type="button" class="btn" id="resetDraftBtn"><i data-lucide="rotate-ccw"></i> Discard changes</button>
+              </div>
+            </form>
+
+            <div class="notice neutral" id="rulesNotice">
+              <i data-lucide="shield-check"></i>
+              <span>Weights are never increased automatically. Progress suggestions appear in the Workout Log, and you decide when to add load.</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Saved plan</h3>
+                <p class="card-sub" id="savedSummary">No plan saved yet.</p>
+              </div>
+            </div>
+            <div class="btn-row">
+              <button class="btn btn-primary btn-block" id="savePlanBtn" disabled><i data-lucide="save"></i> Save plan</button>
+              <button class="btn btn-danger btn-block" id="deletePlanBtn"><i data-lucide="trash-2"></i> Delete saved plan</button>
+            </div>
+            <div id="draftStatus" class="notice hidden"></div>
+            <a class="btn btn-ghost btn-block section-gap" href="calendar.html"><i data-lucide="calendar-days"></i> View in calendar</a>
+          </div>
+        </section>
+
+        <section class="section-gap" id="planEditor"></section>
+      </main>
+    </div>
+  </div>
+
+  <script src="js/storage.js" defer></script>
+  <script src="js/data.js" defer></script>
+  <script src="js/app.js" defer></script>
+  <script src="js/workout-plan.js" defer></script>
+  <script src="js/pwa.js" defer></script>
+</body>
+</html>

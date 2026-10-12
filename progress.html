@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Body Progress · Gym Progress Tracker</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#121315" />
+  <meta name="description" content="Gym Progress Tracker - workouts, plans, progress and reports. Works offline." />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="GymTracker" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+  <script src="https://unpkg.com/lucide@0.383.0/dist/umd/lucide.min.js" defer></script>
+</head>
+<body data-page="progress" data-title="Body Progress">
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <div class="main">
+      <header class="topbar" id="topbar"></header>
+
+      <main class="content">
+        <section class="grid grid-main">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title" id="formTitle">Record measurements</h3>
+                <p class="card-sub">Fill in any fields you measured. Weight is in kg, body measurements in cm.</p>
+              </div>
+            </div>
+
+            <form id="measureForm" novalidate>
+              <input type="hidden" id="mId" />
+              <div class="form-grid">
+                <div class="field"><label for="mDate">Date</label><input type="date" id="mDate" required /></div>
+                <div class="field"><label for="mWeight">Body weight (kg)</label><input type="number" id="mWeight" min="20" max="400" step="0.1" inputmode="decimal" /></div>
+                <div class="field"><label for="mBodyFat">Body fat (%)</label><input type="number" id="mBodyFat" min="2" max="70" step="0.1" inputmode="decimal" /></div>
+                <div class="field"><label for="mChest">Chest (cm)</label><input type="number" id="mChest" min="0" step="0.1" inputmode="decimal" /></div>
+                <div class="field"><label for="mWaist">Waist (cm)</label><input type="number" id="mWaist" min="0" step="0.1" inputmode="decimal" /></div>
+                <div class="field"><label for="mArms">Arms (cm)</label><input type="number" id="mArms" min="0" step="0.1" inputmode="decimal" /></div>
+                <div class="field"><label for="mShoulders">Shoulders (cm)</label><input type="number" id="mShoulders" min="0" step="0.1" inputmode="decimal" /></div>
+                <div class="field"><label for="mThighs">Thighs (cm)</label><input type="number" id="mThighs" min="0" step="0.1" inputmode="decimal" /></div>
+                <div class="field"><label for="mCalves">Calves (cm)</label><input type="number" id="mCalves" min="0" step="0.1" inputmode="decimal" /></div>
+              </div>
+              <div class="btn-row section-gap">
+                <button type="submit" class="btn btn-primary" id="mSave"><i data-lucide="save"></i> Save entry</button>
+                <button type="button" class="btn hidden" id="mCancel"><i data-lucide="x"></i> Cancel edit</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Trend</h3>
+                <p class="card-sub">Pick a measurement to chart</p>
+              </div>
+              <select id="metricSelect" style="max-width:200px" aria-label="Measurement to chart"></select>
+            </div>
+            <div class="chart-box" id="progressChartBox"></div>
+          </div>
+        </section>
+
+        <section class="grid grid-2 section-gap">
+          <div class="card">
+            <div class="card-header"><div><h3 class="card-title">Changes since first entry</h3><p class="card-sub">First recorded value compared with the latest</p></div></div>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead><tr><th>Measurement</th><th>First</th><th>Latest</th><th>Change</th></tr></thead>
+                <tbody id="changesBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><div><h3 class="card-title">History</h3><p class="card-sub">Every entry you have recorded</p></div></div>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead><tr><th>Date</th><th>Weight</th><th>Body fat</th><th>Chest</th><th>Waist</th><th>Arms</th><th></th></tr></thead>
+                <tbody id="historyBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script src="js/storage.js" defer></script>
+  <script src="js/data.js" defer></script>
+  <script src="js/app.js" defer></script>
+  <script src="js/progress.js" defer></script>
+  <script src="js/pwa.js" defer></script>
+</body>
+</html>

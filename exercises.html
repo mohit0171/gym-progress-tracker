@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Exercise Library · Gym Progress Tracker</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#121315" />
+  <meta name="description" content="Gym Progress Tracker - workouts, plans, progress and reports. Works offline." />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="GymTracker" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+  <script src="https://unpkg.com/lucide@0.383.0/dist/umd/lucide.min.js" defer></script>
+</head>
+<body data-page="exercises" data-title="Exercise Library">
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <div class="main">
+      <header class="topbar" id="topbar"></header>
+
+      <main class="content">
+        <section class="filter-bar">
+          <div class="search-box">
+            <i data-lucide="search"></i>
+            <input type="text" id="exerciseSearch" placeholder="Search by name, muscle or equipment" aria-label="Search exercises" />
+          </div>
+          <select id="equipmentFilter" style="max-width:220px" aria-label="Filter by equipment"></select>
+        </section>
+
+        <section class="chip-row" id="categoryChips" style="margin-bottom:18px"></section>
+
+        <p class="muted small" id="resultCount" style="margin:14px 0"></p>
+        <section class="exercise-grid" id="exerciseGrid"></section>
+      </main>
+    </div>
+  </div>
+
+  <script src="js/storage.js" defer></script>
+  <script src="js/data.js" defer></script>
+  <script src="js/app.js" defer></script>
+  <script src="js/exercises.js" defer></script>
+  <script src="js/pwa.js" defer></script>
+</body>
+</html>

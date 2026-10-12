@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Dashboard · Gym Progress Tracker</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#121315" />
+  <meta name="description" content="Gym Progress Tracker - workouts, plans, progress and reports. Works offline." />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="GymTracker" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+  <script src="https://unpkg.com/lucide@0.383.0/dist/umd/lucide.min.js" defer></script>
+</head>
+<body data-page="index" data-title="Dashboard">
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <div class="main">
+      <header class="topbar" id="topbar"></header>
+
+      <main class="content">
+        <section class="page-intro">
+          <h2 id="greeting">Welcome</h2>
+          <p class="muted">Your training snapshot for this month.</p>
+        </section>
+
+        <section class="grid grid-4" id="statCards"></section>
+
+        <section class="grid grid-main section-gap">
+          <div class="card" id="todayCard"></div>
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Recent activity</h3>
+                <p class="card-sub">Latest workouts and measurements</p>
+              </div>
+            </div>
+            <div class="list" id="recentList"></div>
+          </div>
+        </section>
+
+        <section class="grid grid-2 section-gap">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Body weight trend</h3>
+                <p class="card-sub">From your Body Progress entries</p>
+              </div>
+            </div>
+            <div class="chart-box" id="weightChartBox"></div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Training volume</h3>
+                <p class="card-sub">Last 6 months, kg lifted (weight × reps)</p>
+              </div>
+            </div>
+            <div class="chart-box" id="volumeChartBox"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script src="js/storage.js" defer></script>
+  <script src="js/data.js" defer></script>
+  <script src="js/app.js" defer></script>
+  <script src="js/dashboard.js" defer></script>
+  <script src="js/pwa.js" defer></script>
+</body>
+</html>

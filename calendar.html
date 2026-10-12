@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Calendar · Gym Progress Tracker</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#121315" />
+  <meta name="description" content="Gym Progress Tracker - workouts, plans, progress and reports. Works offline." />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="GymTracker" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+  <script src="https://unpkg.com/lucide@0.383.0/dist/umd/lucide.min.js" defer></script>
+</head>
+<body data-page="calendar" data-title="Workout Calendar">
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <div class="main">
+      <header class="topbar" id="topbar"></header>
+
+      <main class="content">
+        <section class="grid grid-main">
+          <div class="card">
+            <div class="cal-header">
+              <div class="btn-row">
+                <button class="icon-btn" id="calPrev" aria-label="Previous month"><i data-lucide="chevron-left"></i></button>
+                <h2 class="cal-title" id="calTitle">Month</h2>
+                <button class="icon-btn" id="calNext" aria-label="Next month"><i data-lucide="chevron-right"></i></button>
+              </div>
+              <button class="btn btn-sm" id="calToday"><i data-lucide="target"></i> Today</button>
+            </div>
+
+            <div class="cal-weekdays">
+              <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div>
+            </div>
+            <div class="cal-grid section-gap" id="calGrid" style="margin-top:8px"></div>
+
+            <div class="legend section-gap">
+              <span><i class="legend-dot" style="background:var(--accent)"></i> Completed</span>
+              <span><i class="legend-dot" style="border:1px dashed var(--info)"></i> Planned</span>
+              <span><i class="legend-dot" style="background:var(--danger)"></i> Missed</span>
+              <span><i class="legend-dot" style="background:var(--warn)"></i> In progress</span>
+              <span><i class="legend-dot" style="background:var(--surface-2)"></i> Rest day</span>
+            </div>
+          </div>
+
+          <div class="card" id="dayDetails"></div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script src="js/storage.js" defer></script>
+  <script src="js/data.js" defer></script>
+  <script src="js/app.js" defer></script>
+  <script src="js/calendar.js" defer></script>
+  <script src="js/pwa.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, viewport-fit=cover" />
+  <title>Offline · Gym Progress Tracker</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#121315" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+</head>
+<body data-page="offline" data-title="Offline">
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+    <div class="main">
+      <header class="topbar" id="topbar"></header>
+      <main class="content">
+        <section class="card" style="max-width:640px;margin:40px auto;text-align:center">
+          <div class="exercise-icon" style="margin:0 auto 12px"><i data-lucide="wifi-off"></i></div>
+          <h2>You are offline</h2>
+          <p class="muted">Your saved workouts, plans and measurements are still available because they are stored in this browser. Connect to the internet to load charts, icons or a page you have not opened before.</p>
+          <div class="btn-row" style="justify-content:center;margin-top:16px">
+            <a class="btn btn-primary" href="index.html"><i data-lucide="layout-dashboard"></i> Back to dashboard</a>
+            <button class="btn" onclick="location.reload()"><i data-lucide="rotate-ccw"></i> Retry</button>
+          </div>
+          <p class="muted small" style="margin-top:16px">Tip: open each page once while online so the service worker caches it for offline use.</p>
+        </section>
+      </main>
+    </div>
+  </div>
+  <script src="https://unpkg.com/lucide@0.383.0/dist/umd/lucide.min.js" defer></script>
+  <script src="js/storage.js" defer></script>
+  <script src="js/data.js" defer></script>
+  <script src="js/app.js" defer></script>
+  <script src="js/pwa.js" defer></script>
+</body>
+</html>
