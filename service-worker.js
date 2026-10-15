@@ -1,5 +1,5 @@
 /* Gym Progress Tracker service worker: offline-first app shell. */
-const CACHE_VERSION = 'gym-pwa-v2';
+const CACHE_VERSION = 'gym-pwa-v4';
 const APP_SHELL = [
   './',
   './index.html',
@@ -18,6 +18,7 @@ const APP_SHELL = [
   './css/premium2.css',
   './css/premium3.css',
   './js/storage.js',
+  './js/goal-templates.js',
   './js/data.js',
   './js/app.js',
   './js/dashboard.js',

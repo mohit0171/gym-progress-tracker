@@ -39,6 +39,18 @@
               </div>
             </div>
 
+            <div class="avatar-block">
+              <div class="avatar avatar-lg" id="avatarCircle"><i data-lucide="user-round"></i></div>
+              <div class="avatar-actions">
+                <p class="avatar-name" id="avatarName">Add a profile photo</p>
+                <p class="small muted">Shown only in this browser. It is stored with the rest of your data.</p>
+                <div class="btn-row" style="margin-top:8px">
+                  <button type="button" class="btn btn-sm" id="avatarChangeBtn"><i data-lucide="camera"></i> Change photo</button>
+                  <button type="button" class="btn btn-sm hidden" id="avatarRemoveBtn"><i data-lucide="trash-2"></i> Remove</button>
+                </div>
+              </div>
+            </div>
+
             <form id="profileForm" novalidate>
               <div class="form-grid">
                 <div class="field"><label for="pName">Name</label><input type="text" id="pName" maxlength="40" /></div>
@@ -93,7 +105,8 @@
   </div>
 
   <script src="js/storage.js" defer></script>
-  <script src="js/goal-templates.js"></script>`n  <script src="js/data.js" defer></script>
+  <script src="js/goal-templates.js"></script>
+  <script src="js/data.js" defer></script>
   <script src="js/app.js" defer></script>
   <script src="js/profile.js" defer></script>
   <script src="js/pwa.js" defer></script>

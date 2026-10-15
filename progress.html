@@ -97,12 +97,27 @@
             </div>
           </div>
         </section>
+
+        <section class="card section-gap">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Progress photos</h3>
+              <p class="card-sub">Day-by-day pictures. Add one after any workout — they stay in this browser only.</p>
+            </div>
+            <div class="photo-add-row">
+              <input type="date" id="photoDate" aria-label="Photo date" />
+              <button class="btn btn-primary" id="addPhotoBtn"><i data-lucide="camera"></i> Add photo</button>
+            </div>
+          </div>
+          <div id="photoGallery"></div>
+        </section>
       </main>
     </div>
   </div>
 
   <script src="js/storage.js" defer></script>
-  <script src="js/goal-templates.js"></script>`n  <script src="js/data.js" defer></script>
+  <script src="js/goal-templates.js"></script>
+  <script src="js/data.js" defer></script>
   <script src="js/app.js" defer></script>
   <script src="js/progress.js" defer></script>
   <script src="js/pwa.js" defer></script>
