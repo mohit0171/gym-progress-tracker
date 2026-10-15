@@ -426,6 +426,71 @@
     });
   };
 
+  /* ---------- Image picker (profile picture & progress photos) ---------- */
+  // Opens the OS photo/camera picker, downscales the chosen image to
+  // maxSize px on its longest edge and returns a JPEG data URL (or null
+  // when the user cancels). Keeps localStorage usage small and predictable.
+  App.pickImage = function (opts) {
+    const maxSize = (opts && opts.maxSize) || 640;
+    return new Promise(resolve => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      if (opts && opts.camera) input.setAttribute('capture', 'user');
+      input.style.display = 'none';
+      document.body.appendChild(input);
+
+      let settled = false;
+      const finish = value => {
+        if (settled) return;
+        settled = true;
+        input.remove();
+        resolve(value);
+      };
+
+      input.addEventListener('change', () => {
+        const file = input.files && input.files[0];
+        if (!file) return finish(null);
+        App.resizeImage(file, maxSize).then(finish).catch(() => {
+          App.toast('That file could not be read as an image.', 'danger');
+          finish(null);
+        });
+      });
+      // Cancelling the picker fires no change event; watch window focus instead.
+      global.addEventListener('focus', () => setTimeout(() => finish(null), 600), { once: true });
+      input.click();
+    });
+  };
+
+  App.resizeImage = function (file, maxSize) {
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
+          const w = Math.max(1, Math.round(img.width * scale));
+          const h = Math.max(1, Math.round(img.height * scale));
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          // JPEG has no alpha; fill white first so transparent PNGs do not go black.
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, w, h);
+          ctx.drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', 0.75));
+        } catch (err) {
+          reject(err);
+        } finally {
+          URL.revokeObjectURL(url);
+        }
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Image failed to load')); };
+      img.src = url;
+    });
+  };
+
   /* ---------- Charts (Chart.js) ---------- */
   App.chartTheme = function () {
     const cs = getComputedStyle(document.documentElement);

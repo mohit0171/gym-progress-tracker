@@ -153,6 +153,50 @@
       }).join('') + '</tbody></table>';
   }
 
+  /* ---------- Progress photos of the month ---------- */
+  function renderPhotos(m) {
+    const box = $('reportPhotos');
+    if (!box) return;
+    const photos = Store.getPhotos().filter(p => p.date >= m.range.start && p.date <= m.range.end);
+    if (!photos.length) {
+      box.innerHTML = App.emptyState('camera', 'No progress photos this month',
+        'Add a photo after a workout on the Workout Log page, or on the Body Progress page.');
+      App.icons();
+      return;
+    }
+    // Group by day; Store.getPhotos returns newest first, so days appear newest first too.
+    const days = [];
+    photos.forEach(p => {
+      let day = days.find(d => d.date === p.date);
+      if (!day) { day = { date: p.date, items: [] }; days.push(day); }
+      day.items.push(p);
+    });
+    box.innerHTML = days.map(day =>
+      '<div class="photo-day">' +
+      '<div class="photo-day-head"><span class="photo-day-title">' +
+      App.esc(App.formatDate(day.date, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })) +
+      '</span><span class="muted small">' + day.items.length + ' photo' + (day.items.length === 1 ? '' : 's') + '</span></div>' +
+      '<div class="photo-thumbs">' +
+      day.items.map(p =>
+        '<button type="button" class="photo-thumb" data-report-photo="' + App.esc(p.id) + '" aria-label="View photo from ' + App.esc(day.date) + '">' +
+        '<img src="' + p.dataUrl + '" alt="Progress photo" loading="lazy" />' +
+        '</button>').join('') +
+      '</div>' +
+      '</div>').join('');
+    App.icons();
+  }
+
+  function viewReportPhoto(id) {
+    const photo = Store.getPhotos().find(p => p.id === id);
+    if (!photo) return;
+    App.modal({
+      title: 'Progress photo · ' + App.formatDate(photo.date, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }),
+      wide: true,
+      html: '<img class="photo-full" src="' + photo.dataUrl + '" alt="Progress photo" />',
+      actions: [{ label: 'Close', className: 'btn-ghost' }]
+    });
+  }
+
   function renderExerciseSelect(data) {
     const select = $('exerciseSelect');
     const current = select.value;
@@ -253,6 +297,10 @@
     $('importBtn').addEventListener('click', () => $('importInput').click());
     $('importInput').addEventListener('change', onImport);
     $('printBtn').addEventListener('click', () => global.print());
+    if ($('reportPhotos')) $('reportPhotos').addEventListener('click', e => {
+      const thumb = e.target.closest('[data-report-photo]');
+      if (thumb) viewReportPhoto(thumb.dataset.reportPhoto);
+    });
   }
 
   $('reportMonth').value = $('reportMonth').value || today.slice(0, 7);
@@ -267,6 +315,7 @@
     renderComparison(curr, prev);
     renderPRs(curr);
     renderBodyChanges(curr);
+    renderPhotos(curr);
     renderExerciseSelect(data);
     renderExerciseHistory(data);
   });

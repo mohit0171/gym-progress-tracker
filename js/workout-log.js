@@ -17,17 +17,22 @@
 
   function newExerciseEntry(exerciseId, plannedEntry) {
     const meta = GymData.exerciseById(exerciseId);
-    const setCount = plannedEntry ? plannedEntry.sets : 3;
-    return {
+    const setCount = (plannedEntry && plannedEntry.sets) || 3;
+    const entry = {
       id: Store.uid('ex'),
       exerciseId,
       name: meta.name,
       category: meta.category,
-      repMin: plannedEntry ? plannedEntry.repMin : 8,
-      repMax: plannedEntry ? plannedEntry.repMax : 12,
-      restSec: plannedEntry ? plannedEntry.restSec : 90,
+      repMin: (plannedEntry && plannedEntry.repMin != null) ? plannedEntry.repMin : 8,
+      repMax: (plannedEntry && plannedEntry.repMax != null) ? plannedEntry.repMax : 12,
+      restSec: (plannedEntry && plannedEntry.restSec != null) ? plannedEntry.restSec : 90,
       sets: Array.from({ length: setCount }, () => ({ id: Store.uid('set'), weight: null, reps: null, done: false }))
     };
+    if (plannedEntry && plannedEntry.minDuration != null) {
+      entry.minDuration = plannedEntry.minDuration;
+      entry.maxDuration = plannedEntry.maxDuration;
+    }
+    return entry;
   }
 
   function createSession(opts) {
@@ -131,6 +136,79 @@
     App.icons();
   }
 
+  /* ---------- Day-wise plan for the week ---------- */
+  function mondayOfWeek(iso) {
+    return App.addDays(iso, -App.weekdayIndex(iso));
+  }
+
+  function planDayStatusBadge(status) {
+    const map = {
+      completed: ['badge-accent', 'Logged'],
+      active: ['badge-warn', 'In progress'],
+      planned: ['badge-info', 'Planned'],
+      missed: ['badge-danger', 'Missed'],
+      rest: ['badge', 'Rest']
+    }[status] || ['badge-info', status];
+    return '<span class="badge ' + map[0] + '">' + map[1] + '</span>';
+  }
+
+  function planExerciseLine(pe) {
+    const meta = GymData.exerciseById(pe.exerciseId);
+    const target = pe.minDuration != null
+      ? pe.minDuration + '–' + pe.maxDuration + ' min'
+      : pe.sets + ' × ' + pe.repMin + '–' + pe.repMax;
+    return '<div class="plan-day-ex"><span>' + App.esc(meta.name) + '</span><span class="muted">' + App.esc(target) + '</span></div>';
+  }
+
+  function renderPlanWeek(data) {
+    const box = $('planWeek');
+    if (!box) return;
+    const plan = data.plan;
+    const days = (data.profile.trainingDays || []).slice().sort((a, b) => a - b);
+    if (!plan || !plan.splits || !plan.splits.length || !days.length) {
+      box.innerHTML =
+        '<div class="card-header"><div><h3 class="card-title">This week\'s plan</h3>' +
+        '<p class="card-sub">Your generated split, day by day. Start any day to log it.</p></div></div>' +
+        '<div class="empty-state"><div class="empty-icon"><i data-lucide="clipboard-list"></i></div>' +
+        '<h4>No training plan yet</h4><p>Generate your personalised split first, then come back here to start each day\'s workout.</p>' +
+        '<a class="btn btn-primary" href="workout-plan.html"><i data-lucide="clipboard-list"></i> <span>Build my plan</span></a></div>';
+      App.icons();
+      return;
+    }
+    const today = Store.todayISO();
+    const anchor = ($('startDate') && $('startDate').value) || today;
+    const monday = mondayOfWeek(anchor);
+    const active = data.sessions.find(s => s.status === 'active');
+    const cards = days.map((wd, pos) => {
+      const date = App.addDays(monday, wd);
+      const split = plan.splits[pos % plan.splits.length];
+      const status = App.dayStatus(date, data, today);
+      const daySessions = data.sessions.filter(s => s.date === date);
+      const isActiveDay = !!(active && active.date === date);
+      const doneCount = daySessions.filter(s => s.status === 'completed').length;
+      let btnLabel = 'Start';
+      let disabled = '';
+      if (active && !isActiveDay) disabled = ' disabled';
+      if (isActiveDay) btnLabel = 'Continue';
+      else if (doneCount > 0) btnLabel = 'Log again';
+      const list = (split.exercises || []).map(planExerciseLine).join('') || '<p class="muted">No exercises in this split.</p>';
+      return '<div class="plan-day-card' + (date === today ? ' is-today' : '') + '">' +
+        '<div class="plan-day-head"><div><div class="plan-day-name">' + App.esc(GymData.WEEKDAYS[wd]) +
+        (date === today ? ' <span class="badge badge-accent">Today</span>' : '') + '</div>' +
+        '<div class="muted">' + App.esc(App.formatDate(date, { month: 'short', day: 'numeric' })) + ' · ' + App.esc(split.label) + '</div></div>' +
+        planDayStatusBadge(status) + '</div>' +
+        '<div class="plan-day-ex-list">' + list + '</div>' +
+        '<div class="plan-day-foot"><span class="muted">' + split.exercises.length + ' exercises' + (doneCount ? ' · logged ' + doneCount + '×' : '') + '</span>' +
+        '<button class="btn btn-primary btn-sm" data-start-day="' + date + '"' + disabled + '><i data-lucide="play"></i> <span>' + btnLabel + '</span></button></div>' +
+        '</div>';
+    }).join('');
+    box.innerHTML =
+      '<div class="card-header"><div><h3 class="card-title">This week\'s plan</h3>' +
+      '<p class="card-sub">Week of ' + App.esc(App.formatDate(monday, { month: 'short', day: 'numeric' })) + ' · tap Start on any day to log that workout.</p></div></div>' +
+      '<div class="plan-week-grid">' + cards + '</div>';
+    App.icons();
+  }
+
   function startFromPlan() {
     const data = Store.load();
     const date = $('startDate').value || Store.todayISO();
@@ -153,6 +231,27 @@
     selectedId = session.id;
     App.toast('Empty workout started. Add exercises below.');
     App.refresh();
+  }
+
+  /* ---------- Post-workout progress photo ---------- */
+  function addProgressPhoto(dateISO) {
+    return App.pickImage({ maxSize: 720 }).then(dataUrl => {
+      if (!dataUrl) return false;                 // user cancelled the picker
+      Store.savePhoto({ date: dateISO, dataUrl });
+      App.toast('Progress photo saved for ' + App.formatDate(dateISO, { month: 'short', day: 'numeric' }) + '.');
+      App.refresh();
+      return true;
+    });
+  }
+
+  function offerPostWorkoutPhoto(dateISO) {
+    App.confirm({
+      title: 'Add a progress photo?',
+      message: 'You just finished your workout. A quick photo helps you see changes over time.',
+      confirmLabel: 'Choose photo'
+    }).then(ok => {
+      if (ok) addProgressPhoto(dateISO);
+    });
   }
 
   /* ---------- Editor ---------- */
@@ -205,6 +304,7 @@
         '<button class="btn btn-primary" data-action="finish-session"><i data-lucide="circle-check"></i> Finish workout</button>' +
         '</div>'
       : '<div class="btn-row section-gap" style="justify-content:flex-end">' +
+        '<button class="btn" data-action="add-photo" style="margin-right:auto"><i data-lucide="camera"></i> Progress photo</button>' +
         '<button class="btn btn-danger" data-action="delete-session"><i data-lucide="trash-2"></i> Delete workout</button>' +
         '<button class="btn btn-primary" data-action="save-session"><i data-lucide="save"></i> Save changes</button>' +
         '</div>';
@@ -224,6 +324,10 @@
   function exerciseBlockHtml(ex, planEntries, session, data) {
     const planned = planEntries.find(p => p.exerciseId === ex.exerciseId);
     const hint = App.suggestion(ex.exerciseId, ex.repMax, data, session.id);
+    const isCardio = ex.minDuration != null;
+    const targetLabel = isCardio
+      ? ex.minDuration + '–' + ex.maxDuration + ' min'
+      : ex.repMin + '–' + ex.repMax + ' reps';
     const setRows = ex.sets.map((set, i) =>
       '<div class="set-row" data-set="' + set.id + '">' +
       '<span class="set-index">' + (i + 1) + '</span>' +
@@ -374,6 +478,12 @@
       App.toast('Workout completed. It now appears on your calendar and dashboard.');
       selectedId = null;
       App.refresh();
+      offerPostWorkoutPhoto(session.date);
+      return;
+    }
+
+    if (action === 'add-photo') {
+      addProgressPhoto(session.date);
       return;
     }
 
@@ -407,6 +517,45 @@
           App.refresh();
         });
     }
+  }
+
+  function onPlanWeekClick(e) {
+    const btn = e.target.closest('[data-start-day]');
+    if (!btn || btn.disabled) return;
+    startDaySession(btn.dataset.startDay);
+  }
+
+  function startDaySession(date) {
+    const data = Store.load();
+    const active = data.sessions.find(s => s.status === 'active');
+    if (active && active.date !== date) {
+      App.toast('Finish or cancel your active workout before starting another day.', 'warn');
+      return;
+    }
+    if (active) {
+      selectedId = active.id;
+      App.refresh();
+      $('editorCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+    const split = App.plannedSplit(date, data);
+    if (!split) {
+      App.toast('No planned workout for that day.', 'danger');
+      return;
+    }
+    if ($('startDate')) $('startDate').value = date;
+    if ($('startTitle')) $('startTitle').value = '';
+    const session = createSession({
+      date,
+      title: split.label,
+      splitLabel: split.label,
+      exercises: (split.exercises || []).map(pe => newExerciseEntry(pe.exerciseId, pe))
+    });
+    selectedId = session.id;
+    App.toast(split.label + ' started for ' + App.formatDate(date, { weekday: 'short', month: 'short', day: 'numeric' }) + '.');
+    App.refresh();
+    App.icons();
+    $('editorCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   function onHistoryClick(e) {
@@ -450,6 +599,7 @@
     $('startDate').addEventListener('change', () => App.refresh());
     $('startFromPlan').addEventListener('click', startFromPlan);
     $('startEmpty').addEventListener('click', startEmpty);
+    if ($('planWeek')) $('planWeek').addEventListener('click', onPlanWeekClick);
     $('editor').addEventListener('change', onEditorChange);
     $('editor').addEventListener('click', onEditorClick);
     $('history').addEventListener('click', onHistoryClick);
@@ -470,6 +620,7 @@
   App.register(function renderWorkoutLog() {
     const data = Store.load();
     renderStartCard(data);
+    renderPlanWeek(data);
     renderEditor(data);
     renderHistory(data);
   });

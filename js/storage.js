@@ -5,6 +5,7 @@
 
   const STORAGE_KEY = 'gymProgressTracker.v1';
   const BACKUP_APP_ID = 'gym-progress-tracker';
+  const MAX_PHOTOS = 80;   // progress photos are capped so localStorage never fills up
 
   function defaultData() {
     return {
@@ -19,11 +20,13 @@
         goal: 'hypertrophy',
         experience: 'beginner',
         equipment: [],
-        trainingDays: []
+        trainingDays: [],
+        avatar: null       // data URL of the profile picture, or null
       },
       plan: null,        // { createdAt, goal, experience, days, trainingDays, splits[] }
       sessions: [],      // workout sessions (active | completed)
-      measurements: []   // body measurement records
+      measurements: [],  // body measurement records
+      photos: []         // daily progress photos { id, date, dataUrl, createdAt }
     };
   }
 
@@ -53,6 +56,7 @@
     }
     if (!Array.isArray(out.profile.equipment)) out.profile.equipment = [];
     if (!Array.isArray(out.profile.trainingDays)) out.profile.trainingDays = [];
+    if (typeof out.profile.avatar !== 'string' || out.profile.avatar.slice(0, 11) !== 'data:image/') out.profile.avatar = null;
     out.profile.trainingDays = out.profile.trainingDays
       .filter(d => Number.isInteger(d) && d >= 0 && d <= 6)
       .sort((a, b) => a - b);
@@ -65,6 +69,11 @@
     }
     if (Array.isArray(raw.measurements)) {
       out.measurements = raw.measurements.filter(m => m && isISODate(m.date));
+    }
+    if (Array.isArray(raw.photos)) {
+      out.photos = raw.photos
+        .filter(p => p && isISODate(p.date) && typeof p.dataUrl === 'string' && p.dataUrl.slice(0, 11) === 'data:image/')
+        .slice(0, MAX_PHOTOS);
     }
     return out;
   }
@@ -130,6 +139,55 @@
 
   function deleteMeasurement(id) {
     return mutate(d => { d.measurements = d.measurements.filter(m => m.id !== id); });
+  }
+
+  /* ---------- Progress photos ---------- */
+  function getPhotos() {
+    return load().photos.slice().sort((a, b) => (b.date + (b.createdAt || '')).localeCompare(a.date + (a.createdAt || '')));
+  }
+
+  function photosForDate(iso) {
+    return getPhotos().filter(p => p.date === iso);
+  }
+
+  // Saves (or updates) a photo. When the day already holds 6 photos
+  // the oldest one for that day is replaced, so a fresh picture never fails.
+  function savePhoto(record) {
+    return mutate(d => {
+      if (!record.id) record.id = uid('pho');
+      record.createdAt = record.createdAt || new Date().toISOString();
+      const sameDay = d.photos.filter(p => p.date === record.date);
+      const i = d.photos.findIndex(p => p.id === record.id);
+      if (i >= 0) {
+        d.photos[i] = record;
+      } else {
+        if (sameDay.length >= 6) {
+          const oldest = sameDay.sort((a, b) => (a.createdAt || '').localeCompare(b.createdAt || ''))[0];
+          d.photos = d.photos.filter(p => p.id !== oldest.id);
+        }
+        d.photos.push(record);
+      }
+      // Hard cap so the browser storage never overflows with images.
+      if (d.photos.length > MAX_PHOTOS) {
+        d.photos.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+        d.photos = d.photos.slice(0, MAX_PHOTOS);
+      }
+      return record;
+    });
+  }
+
+  function deletePhoto(id) {
+    return mutate(d => { d.photos = d.photos.filter(p => p.id !== id); });
+  }
+
+  /* ---------- Avatar ---------- */
+  function getAvatar() { return load().profile.avatar || null; }
+
+  function saveAvatar(dataUrl) {
+    return mutate(d => {
+      d.profile.avatar = (typeof dataUrl === 'string' && dataUrl.slice(0, 11) === 'data:image/') ? dataUrl : null;
+      return d.profile.avatar;
+    });
   }
 
   /* ---------- Profile, plan, settings ---------- */
@@ -206,6 +264,12 @@
     getMeasurements,
     saveMeasurement,
     deleteMeasurement,
+    getPhotos,
+    photosForDate,
+    savePhoto,
+    deletePhoto,
+    getAvatar,
+    saveAvatar,
     getProfile,
     saveProfile,
     getPlan,

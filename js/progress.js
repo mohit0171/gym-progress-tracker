@@ -203,6 +203,76 @@
     $('metricSelect').value = current;
   }
 
+  /* ---------- Progress photos ---------- */
+  function renderPhotos() {
+    const box = $('photoGallery');
+    if (!box) return;
+    const photos = Store.getPhotos();
+    if (!photos.length) {
+      box.innerHTML = App.emptyState('camera', 'No photos yet',
+        'Finish a workout and choose “Add a progress photo”, or use the button above to add one for any day.');
+      App.icons();
+      return;
+    }
+    // Group by day, newest day first (Store.getPhotos is already sorted).
+    const days = [];
+    photos.forEach(p => {
+      let day = days.find(d => d.date === p.date);
+      if (!day) { day = { date: p.date, items: [] }; days.push(day); }
+      day.items.push(p);
+    });
+    const today = Store.todayISO();
+    box.innerHTML = days.map(day =>
+      '<div class="photo-day">' +
+      '<div class="photo-day-head">' +
+      '<span class="photo-day-title">' + App.esc(App.formatDate(day.date, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })) + '</span>' +
+      (day.date === today ? '<span class="badge badge-accent">Today</span>' : '') +
+      '</div>' +
+      '<div class="photo-thumbs">' +
+      day.items.map(p =>
+        '<button type="button" class="photo-thumb" data-photo="' + App.esc(p.id) + '" aria-label="View photo from ' + App.esc(day.date) + '">' +
+        '<img src="' + p.dataUrl + '" alt="Progress photo" loading="lazy" />' +
+        '</button>').join('') +
+      '</div>' +
+      '</div>').join('');
+    App.icons();
+  }
+
+  function viewPhoto(id) {
+    const photo = Store.getPhotos().find(p => p.id === id);
+    if (!photo) return;
+    App.modal({
+      title: 'Progress photo · ' + App.formatDate(photo.date, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }),
+      wide: true,
+      html: '<img class="photo-full" src="' + photo.dataUrl + '" alt="Progress photo" />',
+      actions: [
+        {
+          label: 'Delete photo', className: 'btn-danger', onClick: close => {
+            App.confirm({ title: 'Delete this photo?', message: 'It will be removed from this browser.', confirmLabel: 'Delete', danger: true })
+              .then(ok => {
+                if (!ok) return;
+                Store.deletePhoto(id);
+                close();
+                App.toast('Photo deleted.', 'info');
+                App.refresh();
+              });
+          }
+        },
+        { label: 'Close', className: 'btn-ghost' }
+      ]
+    });
+  }
+
+  function onAddPhoto() {
+    const date = ($('photoDate') && $('photoDate').value) || Store.todayISO();
+    App.pickImage({ maxSize: 720 }).then(dataUrl => {
+      if (!dataUrl) return;                        // cancelled
+      Store.savePhoto({ date, dataUrl });
+      App.toast('Photo added for ' + App.formatDate(date, { month: 'short', day: 'numeric' }) + '.');
+      App.refresh();
+    });
+  }
+
   function bind() {
     $('measureForm').addEventListener('submit', onSubmit);
     $('mCancel').addEventListener('click', resetForm);
@@ -217,6 +287,12 @@
       }
       if (del) onDelete(del.dataset.delete);
     });
+    if ($('addPhotoBtn')) $('addPhotoBtn').addEventListener('click', onAddPhoto);
+    if ($('photoDate')) $('photoDate').value = Store.todayISO();
+    if ($('photoGallery')) $('photoGallery').addEventListener('click', e => {
+      const thumb = e.target.closest('[data-photo]');
+      if (thumb) viewPhoto(thumb.dataset.photo);
+    });
   }
 
   App.register(function renderProgress() {
@@ -225,6 +301,7 @@
     renderChart(entries);
     renderChanges(entries);
     renderHistory(entries);
+    renderPhotos();
   });
 
   resetForm();

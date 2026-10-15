@@ -54,6 +54,43 @@
     }
   }
 
+  /* ---------- Profile picture ---------- */
+  function renderAvatar() {
+    const p = Store.getProfile();
+    const circle = $('avatarCircle');
+    if (p.avatar) {
+      circle.innerHTML = '<img src="' + p.avatar + '" alt="Profile photo" />';
+    } else {
+      circle.innerHTML = '<i data-lucide="user-round"></i>';
+    }
+    $('avatarName').textContent = p.avatar ? (p.name ? p.name + "'s photo" : 'Your photo') : 'Add a profile photo';
+    $('avatarRemoveBtn').classList.toggle('hidden', !p.avatar);
+    App.icons();
+  }
+
+  function onChangeAvatar() {
+    App.pickImage({ maxSize: 320 }).then(dataUrl => {
+      if (!dataUrl) return;                       // cancelled
+      Store.saveAvatar(dataUrl);
+      App.toast('Profile photo updated.');
+      renderAvatar();
+    });
+  }
+
+  function onRemoveAvatar() {
+    App.confirm({
+      title: 'Remove profile photo?',
+      message: 'Your name and other details stay unchanged.',
+      confirmLabel: 'Remove photo',
+      danger: true
+    }).then(ok => {
+      if (!ok) return;
+      Store.saveAvatar(null);
+      App.toast('Profile photo removed.', 'info');
+      renderAvatar();
+    });
+  }
+
   function upsertTodayWeight(weight) {
     const latest = App.latestWeight();
     if (latest && latest.weight === weight) return;
@@ -133,10 +170,13 @@
     $('profileForm').addEventListener('submit', onSubmit);
     $('dayChecks').addEventListener('change', updateDayNotice);
     $('resetAllBtn').addEventListener('click', onReset);
+    $('avatarChangeBtn').addEventListener('click', onChangeAvatar);
+    $('avatarRemoveBtn').addEventListener('click', onRemoveAvatar);
   }
 
   fillSelects();
   fillForm();
+  renderAvatar();
   bind();
   App.register(renderSummary);
 })(window);

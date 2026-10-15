@@ -20,6 +20,7 @@
   }
 
   function makePlanExercise(planExercise, goal, experience) {
+    if (typeof planExercise === 'string') planExercise = { id: planExercise };
     const exerciseId = resolveExerciseId(planExercise.id);
     const isCardio = planExercise.durationMin != null;
     if (isCardio) {
@@ -46,8 +47,9 @@
   function buildPlan(opts) {
     const template = GymData.GOAL_TEMPLATES[opts.goal];
     if (!template) return null;
-    const trainingDays = GymData.getGoalTrainingDays(template, opts.trainingDays.length) || opts.trainingDays;
-    const splits = trainingDays.map(idx => {
+    const weekdays = (opts.trainingDays || []).slice().sort((a, b) => a - b);
+    const templatePicks = GymData.getGoalTrainingDays(template, weekdays.length) || weekdays.map((_, i) => i);
+    const splits = templatePicks.map(idx => {
       const day = template.weeks[0][idx];
       return {
         id: Store.uid('split'),
@@ -60,8 +62,8 @@
       createdAt: opts.createdAt,
       goal: opts.goal,
       experience: opts.experience,
-      days: opts.trainingDays.length,
-      trainingDays,
+      days: weekdays.length,
+      trainingDays: weekdays,
       splits
     };
   }
@@ -100,7 +102,7 @@
     const profile = Store.getProfile();
     $('goal').value = (saved && saved.goal) || profile.goal || 'hypertrophy';
     $('experience').value = (saved && saved.experience) || profile.experience || 'beginner';
-    const days = saved ? saved.days : (profile.trainingDays.length >= 3 && profile.trainingDays.length <= 6 ? profile.trainingDays.length : 4);
+    const days = saved ? saved.days : (profile.trainingDays.length >= 2 && profile.trainingDays.length <= 6 ? profile.trainingDays.length : 4);
     $('days').value = String(days);
     setCheckedDays(profile.trainingDays.length ? profile.trainingDays : GymData.DEFAULT_TRAINING_DAYS[days]);
     updateDayHint();
@@ -146,12 +148,13 @@
             const isCardio = pe.minDuration != null;
             return '<div class="plan-row" data-ex="' + ei + '">' +
               '<div class="plan-name" title="' + App.esc(meta.name) + '">' + App.esc(meta.name) + '</div>' +
-              '<input class="plan-sets" type="number" min="1" max="10" data-field="sets" value="' + pe.sets + '" aria-label="Sets" />' +
+              '<label class="plan-field plan-sets"><span class="plan-tag">Sets</span><input type="number" min="1" max="10" data-field="sets" value="' + pe.sets + '" aria-label="Sets" /></label>' +
               (isCardio
-                ? '<span class="plan-duration">' + pe.minDuration + '–' + pe.maxDuration + ' min</span>'
-                : '<input class="plan-min" type="number" min="1" max="60" data-field="repMin" value="' + pe.repMin + '" aria-label="Minimum reps" />' +
-                  '<input class="plan-max" type="number" min="1" max="60" data-field="repMax" value="' + pe.repMax + '" aria-label="Maximum reps" />') +
-              '<input class="plan-rest" type="number" min="0" max="600" step="15" data-field="restSec" value="' + pe.restSec + '" aria-label="Rest seconds" />' +
+                ? '<label class="plan-field plan-min"><span class="plan-tag">Min (min)</span><input type="number" min="1" max="120" data-field="minDuration" value="' + pe.minDuration + '" aria-label="Minimum minutes" /></label>' +
+                  '<label class="plan-field plan-max"><span class="plan-tag">Max (min)</span><input type="number" min="1" max="120" data-field="maxDuration" value="' + pe.maxDuration + '" aria-label="Maximum minutes" /></label>'
+                : '<label class="plan-field plan-min"><span class="plan-tag">Min reps</span><input type="number" min="1" max="100" data-field="repMin" value="' + pe.repMin + '" aria-label="Minimum reps" /></label>' +
+                  '<label class="plan-field plan-max"><span class="plan-tag">Max reps</span><input type="number" min="1" max="100" data-field="repMax" value="' + pe.repMax + '" aria-label="Maximum reps" /></label>') +
+              '<label class="plan-field plan-rest"><span class="plan-tag">Rest (s)</span><input type="number" min="0" max="600" step="15" data-field="restSec" value="' + pe.restSec + '" aria-label="Rest seconds" /></label>' +
               '<button class="icon-btn danger plan-remove" data-action="remove-ex" aria-label="Remove exercise"><i data-lucide="trash-2"></i></button>' +
               '</div>';
           }).join('') +
@@ -253,10 +256,13 @@
       const isCardio = pe.minDuration != null;
       const limits = {
         sets: [1, 10, pe.sets],
-        minDuration: [1, 60, isCardio ? pe.minDuration : pe.repMin],
-        maxDuration: [1, 60, isCardio ? pe.maxDuration : pe.repMax],
+        repMin: [1, 100, pe.repMin],
+        repMax: [1, 100, pe.repMax],
+        minDuration: [1, 120, isCardio ? pe.minDuration : pe.repMin],
+        maxDuration: [1, 120, isCardio ? pe.maxDuration : pe.repMax],
         restSec: [0, 600, pe.restSec]
       }[el.dataset.field];
+      if (!limits) return;
       pe[el.dataset.field] = readNumber(el, limits[0], limits[1], limits[2]);
       if (el.dataset.field === 'maxDuration' && pe.maxDuration < pe.minDuration) pe.maxDuration = pe.minDuration;
     }
