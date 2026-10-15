@@ -573,10 +573,63 @@ table.data-table { width: 100%; border-collapse: collapse; font-size: 14px; }
 }
 .plan-row:last-child { border-bottom: none; }
 .plan-row-head { color: var(--muted); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-.plan-row input[type="number"] { padding: 8px 10px; }
+.plan-row input[type="number"] { padding: 8px 10px; width: 100%; min-width: 0; }
+.plan-field { display: block; min-width: 0; }
+.plan-field input { width: 100%; }
+.plan-tag { display: none; }
+.plan-duration { font-size: 13px; color: var(--muted); font-weight: 600; grid-column: span 3; align-self: center; }
 .plan-name { font-weight: 600; font-size: 14px; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .split-label-input { font-size: 17px; font-weight: 700; background: transparent; border-color: transparent; padding: 4px 6px; }
 .split-label-input:hover, .split-label-input:focus { border-color: var(--border); background: var(--surface-2); }
+
+/* ---------- Day-wise plan week (workout log) ---------- */
+.plan-week-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; }
+.plan-day-card { border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-2); padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.plan-day-card.is-today { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+.plan-day-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.plan-day-name { font-weight: 800; font-size: 15px; }
+.plan-day-ex-list { display: flex; flex-direction: column; }
+.plan-day-ex { display: flex; justify-content: space-between; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.plan-day-ex:last-child { border-bottom: none; }
+.plan-day-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: auto; padding-top: 4px; }
+
+  /* ---------- Profile picture ---------- */
+.avatar-block { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+.avatar.avatar-lg { width: 84px; height: 84px; font-size: 30px; border-radius: 50%; overflow: hidden; }
+.avatar.avatar-lg img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.avatar-name { font-weight: 700; margin-bottom: 2px; }
+.avatar-actions { flex: 1; min-width: 0; }
+
+/* ---------- Progress photos ---------- */
+.photo-add-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.photo-add-row input[type="date"] {
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm, 10px);
+  background: var(--surface-2);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+}
+.photo-day { margin-bottom: 18px; }
+.photo-day:last-child { margin-bottom: 0; }
+.photo-day-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.photo-day-title { font-weight: 700; font-size: 14px; }
+.photo-thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 12px; }
+.photo-thumb {
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm, 10px);
+  overflow: hidden;
+  background: var(--surface-2);
+  cursor: pointer;
+  aspect-ratio: 3 / 4;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+.photo-thumb:hover { transform: translateY(-2px); border-color: var(--accent); }
+.photo-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.photo-full { max-width: 100%; border-radius: var(--radius-sm, 10px); display: block; margin: 0 auto; }
 
 /* ---------- Calendar ---------- */
 .cal-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
@@ -710,4 +763,6 @@ body.is-offline .topbar { border-bottom-color: var(--warn); }
   .stat-value, .stat-label, .muted, .card-sub { color: #000 !important; }
   .stat-icon { display: none; }
   .chart-box { height: 220px; }
+  .photo-thumb { border: 1px solid #bbb; background: #fff; transform: none; }
+  .photo-day { break-inside: avoid; }
 }

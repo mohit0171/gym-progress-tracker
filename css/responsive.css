@@ -73,12 +73,34 @@
       "rest rest remove";
     gap: 8px;
   }
-  .plan-row .plan-name { grid-area: name; }
+  .plan-row .plan-name { grid-area: name; align-self: center; }
   .plan-row .plan-sets { grid-area: sets; }
   .plan-row .plan-min { grid-area: min; }
   .plan-row .plan-max { grid-area: max; }
   .plan-row .plan-rest { grid-area: rest; }
-  .plan-row .plan-remove { grid-area: remove; justify-self: end; }
+  .plan-row .plan-remove { grid-area: remove; justify-self: end; align-self: start; }
+  .plan-row .plan-field { min-width: 0; }
+  .plan-row .plan-tag {
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .plan-row .plan-name { font-size: 15px; }
+
+  /* Day-wise plan week */
+  .plan-week-grid { grid-template-columns: 1fr; }
+
+  /* Progress photos */
+  .photo-thumbs { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; }
+  .photo-add-row { width: 100%; }
+  .photo-add-row input[type="date"] { flex: 1; min-width: 0; }
+
+  /* Profile picture */
+  .avatar-block { align-items: flex-start; }
 
   /* Calendar */
   .cal-weekdays, .cal-grid { gap: 4px; }
