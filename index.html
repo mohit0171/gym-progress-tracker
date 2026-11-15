@@ -1,121 +1,1045 @@
-﻿<!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Dashboard Â· Gym Progress Tracker</title>
-  <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#0B0D0C" />
-  <meta name="description" content="Gym Progress Tracker - workouts, plans, progress and reports. Works offline." />
-  <meta name="mobile-web-app-capable" content="yes" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' blob:; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="theme-color" content="#1B5E3B" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="GymTracker" />
-  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
-  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png" />
+  <title>weGogym — Gen-Z Athletic OS</title>
+
+  <!-- Fonts: Bricolage Grotesque (Display), Manrope (UI), Space Grotesk (Tabular Stats) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS -->
+
+  <!-- Lucide Icons & Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/lucide@1.66.0/dist/umd/lucide.min.js" integrity="sha384-Z6lHbMYcsXeWgvgnOFekAhjBtVQuTfjyNBGb7d7mrYjt5DNJspJJ9GBp9Kar/z7w" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js" integrity="sha384-dug+JxfBvklEQdJ4AYuBBAIScUz0bVN73xpy273gcAwHjb3qI0fXmuYNaNfdyYJG" crossorigin="anonymous"></script>
+
+<script src="nutrition.js"></script>
+
+  <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
-  <link rel="stylesheet" href="css/style.css" />
-  <link rel="stylesheet" href="css/responsive.css" />
-  <link rel="stylesheet" href="css/premium.css" />
-  <link rel="stylesheet" href="css/premium2.css" />
-  <link rel="stylesheet" href="css/premium3.css" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
-  <script src="https://unpkg.com/lucide@0.383.0/dist/umd/lucide.min.js" defer></script>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.tailwind.css" />
 </head>
-<body data-page="index" data-title="Dashboard">
-  <div class="app-layout">
-    <aside class="sidebar" id="sidebar"></aside>
-    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+<body class="min-h-screen flex flex-col lg:flex-row antialiased selection:bg-volt-400 selection:text-charcoal-950">
 
-    <div class="main">
-      <header class="topbar" id="topbar"></header>
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed top-4 right-4 z-[90] flex flex-col gap-2 max-w-sm w-[calc(100%-2rem)] pointer-events-none"></div>
 
-      <main class="content">
-        <section class="hero">
-          <div class="hero-main">
-            <div class="hero-eyebrow" id="todayDate">Today</div>
-            <h2 class="hero-title" id="greeting">Welcome</h2>
-            <p class="hero-sub muted" id="heroSub">Your training snapshot for this month.</p>
-            <div class="hero-cta">
-              <a class="btn btn-primary btn-start" href="workout-log.html"><i data-lucide="play"></i> <span>Start Workout</span></a>
-              <a class="btn btn-ghost" href="workout-plan.html"><i data-lucide="clipboard-list"></i> <span>My Plan</span></a>
+  <!-- Desktop Left Sidebar -->
+  <aside class="hidden lg:flex lg:flex-col lg:w-72 lg:fixed lg:inset-y-0 border-r-2 border-charcoal-950 dark:border-charcoal-700 bg-white dark:bg-charcoal-900 z-40 px-5 py-6 justify-between">
+    <div>
+      <!-- Brand Logo -->
+      <div class="flex items-center justify-between mb-7 px-2">
+        <div class="flex items-center gap-3 cursor-pointer group" onclick="switchTab('dashboard')">
+          <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-volt-300 via-volt-400 to-volt-500 border-2 border-charcoal-950 flex items-center justify-center shadow-[3px_3px_0px_#09090B] dark:shadow-[3px_3px_0px_rgba(250,204,21,0.35)] group-hover:-rotate-3 transition">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#09090B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6.5 6.5h11M6.5 17.5h11M3 10v4M21 10v4M7 4v16M17 4v16" />
+            </svg>
+          </div>
+          <div>
+            <span class="font-display font-extrabold text-xl tracking-tight text-gray-900 dark:text-gray-100">we<span class="text-volt-500 dark:text-volt-400">Go</span>gym</span>
+            <p class="font-mono-stat text-[10px] font-bold text-gray-500 dark:text-gray-400 tracking-widest uppercase">ATHLETIC OS // V2</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 8 Navigation Items -->
+      <nav id="desktop-nav" class="space-y-1.5" aria-label="Main Navigation"></nav>
+    </div>
+
+    <!-- Bottom Sidebar Controls (No Login — Direct Instant Access) -->
+    <div class="space-y-3 pt-4 border-t border-gray-200 dark:border-charcoal-700">
+      <button onclick="triggerInstallPWA()" id="sidebar-install-btn" data-install-button class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl bg-gray-100 dark:bg-charcoal-800 hover:border-volt-400 border border-gray-300 dark:border-charcoal-700 text-gray-900 dark:text-gray-200 text-xs font-extrabold transition">
+        <span class="flex items-center gap-2"><i data-lucide="download" class="w-4 h-4 text-volt-500 dark:text-volt-400"></i> <span data-install-label>Install App</span></span>
+        <span class="font-mono-stat px-2 py-0.5 rounded-full bg-volt-400 text-charcoal-950 font-extrabold text-[10px]">PWA</span>
+      </button>
+
+      <div class="flex items-center justify-between px-2">
+        <button onclick="toggleTheme()" class="flex items-center gap-2 text-xs font-bold text-gray-700 dark:text-gray-300 hover:text-volt-500 dark:hover:text-volt-400 transition py-1.5">
+          <i data-lucide="sun-moon" class="w-4 h-4 text-volt-500 dark:text-volt-400"></i>
+          <span id="sidebar-theme-label">Dark Mode</span>
+        </button>
+        <span id="sidebar-unit-badge" class="font-mono-stat text-[11px] font-bold px-2.5 py-1 rounded-full bg-gray-100 dark:bg-charcoal-800 text-gray-800 dark:text-gray-300 border border-gray-300 dark:border-charcoal-700">KG / CM</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Mobile Top Header -->
+  <header id="mobile-header" class="lg:hidden sticky top-0 z-30 bg-white/90 dark:bg-charcoal-950/90 backdrop-blur-xl border-b border-gray-300 dark:border-charcoal-700 px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-2.5" onclick="switchTab('dashboard')">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-volt-300 to-volt-500 border border-charcoal-950 flex items-center justify-center">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#09090B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6.5 6.5h11M6.5 17.5h11M3 10v4M21 10v4M7 4v16M17 4v16" />
+        </svg>
+      </div>
+      <span class="font-display font-extrabold text-lg text-gray-900 dark:text-gray-100">we<span class="text-volt-500 dark:text-volt-400">Go</span>gym</span>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <button onclick="triggerInstallPWA()" data-install-button class="p-2 rounded-full bg-gray-100 dark:bg-charcoal-800 text-volt-600 dark:text-volt-400 border border-gray-300 dark:border-charcoal-700" title="Install App" aria-label="Install weGogym App">
+        <i data-lucide="download" class="w-4 h-4"></i>
+      </button>
+      <button onclick="toggleTheme()" class="p-2 rounded-full bg-gray-100 dark:bg-charcoal-800 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-charcoal-700" title="Toggle Theme">
+        <i data-lucide="moon" id="mobile-theme-icon" class="w-4 h-4"></i>
+      </button>
+      <button onclick="switchTab('profile')" class="w-8 h-8 rounded-full overflow-hidden border-2 border-volt-400 bg-charcoal-800 flex items-center justify-center font-mono-stat text-xs font-extrabold text-volt-400" id="mobile-header-avatar">
+        WG
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="flex-1 lg:pl-72 pb-28 lg:pb-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+
+      <!-- ========================================================= -->
+      <!-- TAB 1: DASHBOARD                                          -->
+      <!-- ========================================================= -->
+      <section id="tab-dashboard" class="tab-section space-y-6">
+        <!-- Instant Welcome Hero Banner (Dismissible, No Login Required) -->
+        <div id="welcome-hero-banner" class="surface-card box-dashboard-welcome p-5 sm:p-6 bg-gradient-to-r from-charcoal-900 via-charcoal-850 to-charcoal-900 text-gray-100 border-volt-400/40 relative overflow-hidden">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+            <div class="space-y-1.5">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="px-3 py-1 rounded-full bg-volt-400 text-charcoal-950 text-[11px] font-extrabold uppercase tracking-wider">Instant Access • No Login Required</span>
+                <span class="px-3 py-1 rounded-full bg-charcoal-800 text-gray-300 border border-charcoal-700 text-[11px] font-semibold">Encrypted On-Device Storage</span>
+              </div>
+              <h2 class="text-xl sm:text-2xl font-display font-extrabold text-white">Feel Strong. Train Smarter with <span class="text-volt-400">weGogym</span></h2>
+              <p class="text-xs sm:text-sm text-gray-300 max-w-2xl">Build adaptive splits, log sets & PRs, track body measurements, and compile monthly transformation videos—all directly in your browser.</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+              <button onclick="switchTab('plan')" class="btn-primary px-5 py-2.5 text-xs flex items-center gap-1.5">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Build Workout Plan
+              </button>
+              <button onclick="dismissWelcomeBanner()" class="px-3.5 py-2.5 rounded-full bg-charcoal-800 hover:bg-charcoal-700 text-gray-300 text-xs font-semibold border border-charcoal-700">
+                Hide Banner
+              </button>
             </div>
           </div>
-          <div class="hero-side">
-            <div class="mini-profile">
-              <div class="avatar" id="avatarInitial">G</div>
-              <div style="min-width:0">
-                <div style="font-weight:800" id="profileName">Athlete</div>
-                <div class="muted small" id="profileMeta">Set up your profile</div>
-              </div>
-              <span class="streak-pill" style="margin-left:auto" id="streakPill"><i data-lucide="flame"></i> <span>0</span></span>
-            </div>
-            <div class="card" style="padding:14px 16px">
-              <div style="display:flex;justify-content:space-between;align-items:center">
-                <strong style="font-size:13px">This week</strong>
-                <span class="muted small" id="weekCount">0 workouts</span>
-              </div>
-              <div class="week-bars" id="weekBars" aria-label="Weekly activity"></div>
-            </div>
-          </div>
-        </section>
+        </div>
 
-        <section class="grid grid-4" id="statCards"></section>
-
-        <section class="grid grid-main section-gap">
-          <div class="card" id="todayCard"></div>
-          <div class="card">
-            <div class="card-header">
-              <div>
-                <h3 class="card-title">Recent activity</h3>
-                <p class="card-sub">Latest workouts and measurements</p>
-              </div>
-              <a class="btn btn-sm btn-ghost" href="workout-log.html">View all</a>
+        <!-- Dynamic Greeting Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="flex items-center gap-3.5">
+            <div onclick="switchTab('profile')" id="dash-avatar" class="w-14 h-14 rounded-2xl bg-charcoal-800 border-2 border-volt-400 flex items-center justify-center overflow-hidden cursor-pointer shrink-0">
+              <span class="font-display font-extrabold text-lg text-volt-400">WG</span>
             </div>
-            <div class="list" id="recentList"></div>
-          </div>
-        </section>
-
-        <section class="grid grid-2 section-gap">
-          <div class="card">
-            <div class="card-header">
-              <div>
-                <h3 class="card-title">Body weight trend</h3>
-                <p class="card-sub">From your Body Progress entries</p>
-              </div>
-            </div>
-            <div class="chart-box" id="weightChartBox"></div>
-          </div>
-          <div class="card">
-            <div class="card-header">
-              <div>
-                <h3 class="card-title">Training volume</h3>
-                <p class="card-sub">Last 6 months, kg lifted (weight Ã— reps)</p>
-              </div>
-            </div>
-            <div class="chart-box" id="volumeChartBox"></div>
-          </div>
-        </section>
-
-        <section class="card section-gap">
-          <div class="card-header">
             <div>
-              <h3 class="card-title">Monthly consistency</h3>
-              <p class="card-sub">Workout days this month â€” darker green means more volume</p>
+              <p id="dash-date" class="text-xs font-bold uppercase tracking-wider text-volt-600 dark:text-volt-400"></p>
+              <h1 id="dash-greeting" class="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-100 leading-tight">Good Morning, Athlete</h1>
             </div>
-            <a class="btn btn-sm btn-ghost" href="calendar.html">Calendar</a>
           </div>
-          <div class="heat" id="monthHeat"></div>
+
+          <div class="flex flex-wrap items-center gap-2.5 self-start sm:self-center">
+            <span id="dash-goal-badge" class="pill-chip px-3.5 py-1.5 text-xs bg-gray-200 dark:bg-charcoal-800 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-charcoal-700">Goal: Muscle Growth</span>
+            <button onclick="switchTab('log')" class="btn-primary px-5 py-2.5 text-xs flex items-center gap-1.5">
+              <i data-lucide="play" class="w-3.5 h-3.5 fill-current"></i> Quick Session
+            </button>
+            <!-- GitHub URL is configured once in app.js (GITHUB_REPOSITORY_URL). -->
+            <button onclick="openGitHubRepo()" data-github-repo class="github-repo-button px-4 py-2.5 text-xs flex items-center gap-1.5" title="Open GitHub repository">
+              <i data-lucide="code" class="w-3.5 h-3.5"></i> GitHub Repo
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 Real-Time Summary Cards -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
+          <div class="surface-card box-dashboard-stat-workouts p-4 sm:p-5">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">Workouts Done</span>
+              <div class="w-8 h-8 rounded-xl bg-volt-400/15 text-volt-500 dark:text-volt-400 flex items-center justify-center">
+                <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div id="stat-workouts-count" class="text-2xl sm:text-3xl font-display font-extrabold text-gray-900 dark:text-white">0</div>
+            <p id="stat-completion-rate" class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">0% plan adherence</p>
+          </div>
+
+          <div class="surface-card box-dashboard-stat-streak p-4 sm:p-5 border-volt-400/35">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">Daily Streak</span>
+              <div class="w-8 h-8 rounded-xl bg-volt-400 text-charcoal-950 flex items-center justify-center">
+                <i data-lucide="flame" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div class="flex items-baseline gap-1.5">
+              <span id="stat-current-streak" class="text-2xl sm:text-3xl font-display font-extrabold text-volt-500 dark:text-volt-400">0</span>
+              <span class="text-xs font-semibold text-gray-400">days</span>
+            </div>
+            <p id="stat-longest-streak" class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Best: 0 days</p>
+          </div>
+
+          <div class="surface-card box-dashboard-stat-volume p-4 sm:p-5">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">Total Volume</span>
+              <div class="w-8 h-8 rounded-xl bg-gray-200 dark:bg-charcoal-800 text-gray-700 dark:text-gray-300 flex items-center justify-center">
+                <i data-lucide="dumbbell" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div class="flex items-baseline gap-1">
+              <span id="stat-total-volume" class="text-2xl sm:text-3xl font-display font-extrabold">0</span>
+              <span class="unit-weight-label text-xs font-semibold text-gray-400">kg</span>
+            </div>
+            <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Cumulative lifted</p>
+          </div>
+
+          <div class="surface-card box-dashboard-stat-activity p-4 sm:p-5">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">Weekly Activity</span>
+              <div class="w-8 h-8 rounded-xl bg-emerald-400/15 text-emerald-500 dark:text-emerald-400 flex items-center justify-center">
+                <i data-lucide="activity" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div class="flex items-baseline gap-1">
+              <span id="stat-weekly-activity" class="text-2xl sm:text-3xl font-display font-extrabold">0</span>
+              <span id="stat-weekly-target" class="text-xs font-semibold text-gray-400">/ 0 days</span>
+            </div>
+            <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Current week (Mon–Sun)</p>
+          </div>
+        </div>
+
+        <!-- Today's Workout Hero + Mini Monthly Consistency -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <!-- Today's Workout Card -->
+          <div id="todays-workout-card" class="lg:col-span-7 surface-card box-dashboard-today-workout p-6 relative overflow-hidden flex flex-col justify-between">
+            <!-- Populated dynamically by renderDashboard() -->
+          </div>
+
+          <!-- Monthly Consistency Mini Grid -->
+          <div class="lg:col-span-5 surface-card box-dashboard-monthly-consistency p-6 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <div>
+                  <h2 class="text-lg font-bold">Monthly Consistency</h2>
+                  <p id="dash-month-label" class="text-xs text-gray-500 dark:text-gray-400"></p>
+                </div>
+                <button onclick="switchTab('calendar')" class="text-xs font-bold text-volt-600 dark:text-volt-400 hover:underline flex items-center gap-1">
+                  Full Calendar <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+              <div id="dash-mini-calendar" class="grid grid-cols-7 gap-1.5 text-center"></div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-3 pt-4 mt-4 border-t border-gray-200 dark:border-charcoal-700 text-[11px] text-gray-500 dark:text-gray-400">
+              <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span> Completed</span>
+              <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-volt-400"></span> Planned</span>
+              <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-400"></span> Missed</span>
+              <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-gray-500"></span> Rest</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Weekly Volume Chart & Recent Sessions -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <div class="lg:col-span-8 surface-card box-dashboard-volume-chart p-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+              <div>
+                <h2 class="text-lg font-display font-extrabold">Weekly Training Volume</h2>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Total tonnage lifted per day over the last 7 days</p>
+              </div>
+              <span class="unit-weight-label sticker-badge self-start">Volume (kg)</span>
+            </div>
+            <div class="h-64 w-full relative">
+              <canvas id="dashboardVolumeChart"></canvas>
+            </div>
+          </div>
+
+          <div class="lg:col-span-4 surface-card box-dashboard-recent-sessions p-6 flex flex-col">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-lg font-display font-extrabold">Recent Sessions</h2>
+              <button onclick="switchTab('log')" class="text-xs font-extrabold text-volt-600 dark:text-volt-400 hover:underline">View All</button>
+            </div>
+            <div id="dash-recent-workouts" class="space-y-3 flex-1"></div>
+          </div>
+        </div>
+
+        <!-- Nutrition overview: targets come from the profile (Profile > Nutrition Targets) -->
+        <section class="nutrition-preview surface-card box-dashboard-nutrition-overview p-5 sm:p-6" aria-label="Nutrition overview">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+            <div>
+              <h2 class="text-lg font-display font-extrabold">Nutrition Overview</h2>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Your daily targets, calculated from your profile</p>
+            </div>
+            <span class="nutrition-date-chip" data-nut="goal-name">TODAY · DAILY TARGET</span>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="nutrition-calorie-card box-dashboard-nutrition-calories">
+              <div class="calorie-ring"><div><strong data-nut="kcal">—</strong><span>kcal</span></div></div>
+              <div class="mt-3 text-center">
+                <p class="text-sm font-extrabold">Daily calorie target</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400" data-nut="adj-text">—</p>
+              <p data-nut-warnings class="hidden mt-3 text-xs font-semibold text-amber-600 dark:text-amber-400 leading-relaxed"></p>
+              </div>
+            </div>
+            <div class="nutrition-macros box-dashboard-nutrition-macros md:col-span-2">
+              <div class="macro-row">
+                <div class="flex justify-between text-xs mb-2"><span class="font-bold">Protein</span><span class="font-mono-stat"><span data-nut="protein">—</span>g <span class="macro-muted"><span data-nut="protein-pct">—</span>% of kcal</span></span></div>
+                <div class="macro-track"><span data-nut-bar="protein" style="width:0%"></span></div>
+              </div>
+              <div class="macro-row">
+                <div class="flex justify-between text-xs mb-2"><span class="font-bold">Carbs</span><span class="font-mono-stat"><span data-nut="carbs">—</span>g <span class="macro-muted"><span data-nut="carbs-pct">—</span>% of kcal</span></span></div>
+                <div class="macro-track carbs"><span data-nut-bar="carbs" style="width:0%"></span></div>
+              </div>
+              <div class="macro-row">
+                <div class="flex justify-between text-xs mb-2"><span class="font-bold">Fats</span><span class="font-mono-stat"><span data-nut="fat">—</span>g <span class="macro-muted"><span data-nut="fat-pct">—</span>% of kcal</span></span></div>
+                <div class="macro-track fats"><span data-nut-bar="fat" style="width:0%"></span></div>
+              </div>
+              <div class="nutrition-footnote"><i data-lucide="info" class="w-3.5 h-3.5"></i> Targets update from your profile. Meal logging isn't connected yet. <button onclick="switchTab('profile')" class="ml-1 font-bold underline text-volt-600 dark:text-volt-400">Edit in Profile</button></div>
+            </div>
+          </div>
         </section>
-      </main>
+      </section>
+
+      <!-- ========================================================= -->
+      <!-- TAB 2: WORKOUT PLAN BUILDER                               -->
+      <!-- ========================================================= -->
+      <section id="tab-plan" class="tab-section hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold">Workout Plan Builder</h1>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Architect a custom weekly training split calibrated to your goals, days, and gear.</p>
+          </div>
+          <div id="active-plan-status-pill" class="self-start"></div>
+        </div>
+
+        <!-- Builder Configuration Card -->
+        <div class="surface-card box-plan-builder p-5 sm:p-6 space-y-6">
+          <!-- Step 1: Fitness Goal Chips -->
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-300 mb-2.5">1. Primary Fitness Goal</label>
+            <div id="plan-goal-chips" class="flex flex-wrap gap-2"></div>
+          </div>
+
+          <!-- Step 2: Experience Level & Duration -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-300 mb-2.5">2. Experience Level</label>
+              <div id="plan-level-chips" class="grid grid-cols-3 gap-2"></div>
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-300 mb-2.5">3. Preferred Session Duration</label>
+              <div id="plan-duration-chips" class="grid grid-cols-4 gap-2"></div>
+            </div>
+          </div>
+
+          <!-- Step 3: Days Per Week & Individual Day Selection -->
+          <div>
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+              <label class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-300">4. Training Days per Week & Schedule (Mon–Sun)</label>
+              <div id="plan-daycount-chips" class="flex gap-1.5"></div>
+            </div>
+            <div id="plan-weekdays-selector" class="grid grid-cols-7 gap-2"></div>
+            <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-2">Tap individual days to toggle Training vs. Rest days (including weekends).</p>
+          </div>
+
+          <!-- Step 4: Available Equipment -->
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-300 mb-2.5">5. Available Equipment</label>
+            <div id="plan-equipment-chips" class="flex flex-wrap gap-2"></div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex flex-wrap items-center gap-3 pt-4 border-t border-gray-200 dark:border-charcoal-700">
+            <button onclick="generateWorkoutPlan(false)" class="plan-action-button plan-action-generate btn-primary px-6 py-3 text-sm flex items-center gap-2">
+              <i data-lucide="sparkles" class="w-4 h-4"></i> Generate Plan
+            </button>
+            <button onclick="generateWorkoutPlan(true)" class="plan-action-button plan-action-regenerate px-5 py-3 rounded-full text-sm font-semibold transition flex items-center gap-2">
+              <i data-lucide="refresh-cw" class="w-4 h-4"></i> Regenerate
+            </button>
+            <button onclick="saveDraftPlan()" id="btn-save-plan" class="plan-action-button plan-action-save px-5 py-3 rounded-full text-sm font-bold transition flex items-center gap-2">
+              <i data-lucide="bookmark-check" class="w-4 h-4"></i> Save Active Plan
+            </button>
+            <button onclick="discardDraftPlan()" class="px-4 py-3 rounded-full text-sm font-semibold text-rose-500 hover:bg-rose-500/10 transition flex items-center gap-1.5 ml-auto">
+              <i data-lucide="trash-2" class="w-4 h-4"></i> Discard
+            </button>
+          </div>
+        </div>
+
+        <!-- Generated / Active Weekly Split Display -->
+        <div id="plan-schedule-output" class="space-y-4"></div>
+      </section>
+
+      <!-- ========================================================= -->
+      <!-- TAB 3: WORKOUT LOG & ACTIVE TRACKER                       -->
+      <!-- ========================================================= -->
+      <section id="tab-log" class="tab-section hidden space-y-6">
+        <!-- Active Workout View (Shown when session is active) -->
+        <div id="active-workout-container" class="hidden space-y-5"></div>
+
+        <!-- Standard Workout Log Hub (Shown when no active session) -->
+        <div id="workout-log-hub" class="space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h1 class="text-2xl sm:text-3xl font-extrabold">Workout Log</h1>
+              <p class="text-sm text-gray-500 dark:text-gray-400">Launch a session from your weekly plan, build a freestyle workout, or review past lifts.</p>
+            </div>
+            <button onclick="startEmptyWorkout()" class="btn-primary px-5 py-3 text-sm flex items-center gap-2 self-start">
+              <i data-lucide="plus-circle" class="w-4 h-4"></i> Start Empty Workout
+            </button>
+          </div>
+
+          <!-- This Week's Plan Quick Launcher -->
+          <div class="surface-card box-log-weekly-plan p-5 sm:p-6">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-lg font-bold flex items-center gap-2">
+                <i data-lucide="calendar-check" class="w-5 h-5 text-volt-500 dark:text-volt-400"></i> This Week's Planned Workouts
+              </h2>
+              <button onclick="switchTab('plan')" class="text-xs font-bold text-volt-600 dark:text-volt-400 hover:underline">Edit Plan</button>
+            </div>
+            <div id="log-weekly-plan-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3"></div>
+          </div>
+
+          <!-- Saved Plans & Past Workouts -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+            <div class="lg:col-span-5 surface-card box-log-saved-plans p-5 sm:p-6">
+              <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+                <i data-lucide="folder-heart" class="w-5 h-5 text-volt-500 dark:text-volt-400"></i> Saved Plans
+              </h2>
+              <div id="log-saved-plans-list" class="space-y-3"></div>
+            </div>
+
+            <div class="lg:col-span-7 surface-card box-log-past-workouts p-5 sm:p-6">
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-bold flex items-center gap-2">
+                  <i data-lucide="history" class="w-5 h-5 text-volt-500 dark:text-volt-400"></i> Past Completed Workouts
+                </h2>
+                <span id="log-past-count" class="text-xs font-semibold text-gray-400">0 sessions</span>
+              </div>
+              <div id="log-past-workouts-list" class="space-y-3"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================= -->
+      <!-- TAB 4: EXERCISE LIBRARY                                   -->
+      <!-- ========================================================= -->
+      <section id="tab-library" class="tab-section hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold">Exercise Library</h1>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Explore biomechanics, form cues, and add movements directly to your training plan.</p>
+          </div>
+          <button onclick="toggleLibraryFavoritesFilter()" id="lib-fav-toggle" class="pill-chip px-4 py-2 text-xs font-semibold bg-gray-100 dark:bg-charcoal-800 border border-gray-200 dark:border-charcoal-700 flex items-center gap-2 self-start">
+            <i data-lucide="heart" class="w-3.5 h-3.5 text-volt-500 dark:text-volt-400"></i> Favorites Only
+          </button>
+        </div>
+
+        <!-- Search & Filters -->
+        <div class="surface-card box-library-filters p-4 sm:p-5 space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+            <div class="md:col-span-6 relative">
+              <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2"></i>
+              <input type="text" id="lib-search-input" oninput="renderExerciseLibrary()" placeholder="Search exercises by name, muscle, or cue..." class="w-full pl-11 pr-4 py-2.5 rounded-full bg-gray-100 dark:bg-charcoal-800 border border-gray-200 dark:border-charcoal-700 text-sm focus:outline-none focus:border-volt-400" />
+            </div>
+            <div class="md:col-span-3">
+              <select id="lib-goal-select" onchange="renderExerciseLibrary()" class="library-selection-control library-selection-goal is-selected w-full px-4 py-2.5 rounded-full text-sm font-medium focus:outline-none"><option value="All">All Goals</option><option>Strength</option><option>Muscle Growth</option><option>Fat Loss</option><option>Endurance</option><option>Calisthenics</option></select></div><div class="md:col-span-3">
+              <select id="lib-equipment-select" onchange="renderExerciseLibrary()" class="library-selection-control library-selection-equipment is-selected w-full px-4 py-2.5 rounded-full text-sm font-medium focus:outline-none">
+                <option value="All">All Equipment</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Category Pills -->
+          <div id="lib-category-pills" class="flex items-center gap-2 overflow-x-auto pb-1"></div>
+        </div>
+
+        <!-- Exercise Cards Grid -->
+        <div id="lib-exercises-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      </section>
+
+      <!-- ========================================================= -->
+      <!-- TAB 5: CALENDAR                                           -->
+      <!-- ========================================================= -->
+      <section id="tab-calendar" class="tab-section hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold">Training Calendar</h1>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Track scheduled workouts, completed sessions, rest days, and transformation snapshots.</p>
+          </div>
+          <div class="flex items-center gap-2 bg-white dark:bg-charcoal-900 border border-gray-200 dark:border-charcoal-700 rounded-full p-1 self-start">
+            <button onclick="changeCalendarMonth(-1)" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-charcoal-800 transition">
+              <i data-lucide="chevron-left" class="w-4 h-4"></i>
+            </button>
+            <span id="cal-current-month-title" class="px-4 font-display font-bold text-sm min-w-[140px] text-center"></span>
+            <button onclick="changeCalendarMonth(1)" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-charcoal-800 transition">
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Monthly Summary Strip -->
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+          <div class="surface-card box-calendar-stat-completed p-3.5 text-center">
+            <p class="text-[11px] font-semibold text-gray-400">Completed</p>
+            <p id="cal-stat-completed" class="text-xl font-display font-extrabold text-emerald-400 mt-0.5">0</p>
+          </div>
+          <div class="surface-card box-calendar-stat-missed p-3.5 text-center">
+            <p class="text-[11px] font-semibold text-gray-400">Missed</p>
+            <p id="cal-stat-missed" class="text-xl font-display font-extrabold text-rose-400 mt-0.5">0</p>
+          </div>
+          <div class="surface-card box-calendar-stat-planned p-3.5 text-center">
+            <p class="text-[11px] font-semibold text-gray-400">Planned</p>
+            <p id="cal-stat-planned" class="text-xl font-display font-extrabold text-gray-700 dark:text-gray-200 mt-0.5">0</p>
+          </div>
+          <div class="surface-card box-calendar-stat-rest p-3.5 text-center">
+            <p class="text-[11px] font-semibold text-gray-400">Rest Days</p>
+            <p id="cal-stat-rest" class="text-xl font-display font-extrabold text-gray-400 mt-0.5">0</p>
+          </div>
+          <div class="surface-card box-calendar-stat-consistency p-3.5 text-center col-span-2 sm:col-span-1 border-volt-400/40">
+            <p class="text-[11px] font-semibold text-gray-400">Consistency</p>
+            <p id="cal-stat-consistency" class="text-xl font-display font-extrabold text-volt-500 dark:text-volt-400 mt-0.5">0%</p>
+          </div>
+        </div>
+
+        <!-- Calendar Grid + Selected Date Detail Panel -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <div class="lg:col-span-8 surface-card box-calendar-grid p-4 sm:p-6">
+            <div class="grid grid-cols-7 gap-2 text-center text-xs font-bold text-gray-400 mb-3">
+              <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div>
+            </div>
+            <div id="calendar-days-grid" class="grid grid-cols-7 gap-1.5 sm:gap-2"></div>
+            <div class="flex flex-wrap items-center gap-4 mt-5 pt-4 border-t border-gray-200 dark:border-charcoal-700 text-xs text-gray-500 dark:text-gray-400">
+              <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span> Completed</span>
+              <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-400"></span> Missed</span>
+              <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-gray-300"></span> Planned</span>
+              <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-volt-400"></span> In Progress</span>
+              <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-gray-600"></span> Rest Day</span>
+            </div>
+          </div>
+
+          <div id="calendar-day-detail" class="lg:col-span-4 surface-card box-calendar-day-detail p-5 sm:p-6">
+            <!-- Populated when a date is clicked -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================= -->
+      <!-- TAB 6: BODY PROGRESS & TRANSFORMATION PHOTOS              -->
+      <!-- ========================================================= -->
+      <section id="tab-progress" class="tab-section hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold">Body Progress</h1>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Log anthropometric measurements, track trends, and compare transformation photos privately.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <label class="btn-primary px-4 py-2.5 text-xs flex items-center gap-1.5 cursor-pointer">
+              <i data-lucide="camera" class="w-4 h-4"></i> Add Progress Photo
+              <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handleDirectPhotoUpload(event)" />
+            </label>
+          </div>
+        </div>
+
+        <!-- Record Measurements Form + Trend Chart -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <!-- Measurement Entry Form -->
+          <form id="measurement-form" onsubmit="saveMeasurementEntry(event)" class="lg:col-span-5 surface-card box-progress-measurement-form p-5 sm:p-6 space-y-4">
+            <div class="flex items-center justify-between">
+              <h2 id="meas-form-title" class="text-lg font-bold">Record Measurements</h2>
+              <button type="button" id="meas-cancel-edit" onclick="resetMeasurementForm()" class="hidden text-xs text-rose-400 hover:underline">Cancel Edit</button>
+            </div>
+            <input type="hidden" id="meas-edit-id" value="" />
+
+            <div>
+              <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Entry Date</label>
+              <input type="date" id="meas-date" required class="w-full px-3.5 py-2 rounded-xl bg-gray-100 dark:bg-charcoal-800 border border-gray-200 dark:border-charcoal-700 text-sm" />
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Weight (<span class="unit-weight-label">kg</span>)</label>
+                <input type="number" step="0.1" id="meas-weight" placeholder="e.g. 74.5" class="w-full px-3.5 py-2 rounded-xl bg-gray-100 dark:bg-charcoal-800 border border-gray-200 dark:border-charcoal-700 text-sm" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Body Fat (%)</label>
+                <input type="number" step="0.1" id="meas-bodyfat" placeholder="e.g. 14.2" class="w-full px-3.5 py-2 rounded-xl bg-gray-100 dark:bg-charcoal-800 border border-gray-200 dark:border-charcoal-700 text-sm" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Chest (<span class="unit-length-label">cm</span>)</label>
+                <input type="number" step="0.1" id="meas-chest" placeholder="e.g. 102" class="w-full px-3.5 py-2 rounded-xl bg-gray-100 dark:bg-charcoal-800 border border-gray-200 dark:border-charcoal-700 text-sm" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Arms (<span class="unit-length-label">cm</span>)</label>
+                <input type="number" step="0.1" id="meas-arms" placeholder="e.g. 38.5" class="w-full px-3.5 py-2 rounded-xl bg-gray-100 dark:bg-charcoal-800 border border-gray-200 dark:border-charcoal-700 text-sm" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Waist (<span class="unit-length-label">cm</span>)</label>
+                <input type="number" step="0.1" id="meas-waist" placeholder="e.g. 79" class="w-full px-3.5 py-2 rounded-xl bg-gray-100 dark:bg-charcoal-800 border border-gray-200 dark:border-charcoal-700 text-sm" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Thighs (<span class="unit-length-label">cm</span>)</label>
+                <input type="number" step="0.1" id="meas-thighs" placeholder="e.g. 58" class="w-full px-3.5 py-2 rounded-xl bg-gray-100 dark:bg-charcoal-800 border border-gray-200 dark:border-charcoal-700 text-sm" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Shoulders (<span class="unit-length-label">cm</span>)</label>
+                <input type="number" step="0.1" id="meas-shoulders" placeholder="e.g. 118" class="w-full px-3.5 py-2 rounded-xl bg-gray-100 dark:bg-charcoal-800 border border-gray-200 dark:border-charcoal-700 text-sm" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Calves (<span class="unit-length-label">cm</span>)</label>
+                <input type="number" step="0.1" id="meas-calves" placeholder="e.g. 38" class="w-full px-3.5 py-2 rounded-xl bg-gray-100 dark:bg-charcoal-800 border border-gray-200 dark:border-charcoal-700 text-sm" />
+              </div>
+            </div>
+
+            <button type="submit" class="btn-primary w-full py-3 text-sm flex items-center justify-center gap-2">
+              <i data-lucide="save" class="w-4 h-4"></i> Save Entry
+            </button>
+          </form>
+
+          <!-- Progress Trend Box -->
+          <div class="lg:col-span-7 surface-card box-progress-trend p-5 sm:p-6 flex flex-col justify-between">
+            <div>
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                <h2 class="text-lg font-bold">Progress Trend</h2>
+                <div class="flex flex-wrap items-center gap-2">
+                  <select id="trend-metric-select" onchange="renderProgressChart()" class="px-3 py-1.5 rounded-full bg-gray-100 dark:bg-charcoal-800 border border-gray-200 dark:border-charcoal-700 text-xs font-semibold">
+                    <option value="weight">Weight</option>
+                    <option value="bodyFat">Body Fat %</option>
+                    <option value="chest">Chest</option>
+                    <option value="arms">Arms</option>
+                    <option value="waist">Waist</option>
+                    <option value="thighs">Thighs</option>
+                    <option value="shoulders">Shoulders</option>
+                    <option value="calves">Calves</option>
+                  </select>
+                  <div id="trend-range-pills" class="flex gap-1"></div>
+                </div>
+              </div>
+              <div class="h-64 w-full relative">
+                <canvas id="bodyProgressChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Changes Since First Entry -->
+            <div id="changes-since-first" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-4 mt-4 border-t border-gray-200 dark:border-charcoal-700"></div>
+          </div>
+        </div>
+
+        <!-- Measurement History Table -->
+        <div class="surface-card box-progress-history p-5 sm:p-6">
+          <h2 class="text-lg font-bold mb-4">Measurement History</h2>
+          <div id="measurement-history-container" class="overflow-x-auto"></div>
+        </div>
+
+        <!-- Private Progress Photo Timeline & Before/After Comparison -->
+        <div class="surface-card box-progress-photo-journal p-5 sm:p-6 space-y-5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h2 class="text-lg font-bold flex items-center gap-2">
+                <i data-lucide="lock" class="w-4 h-4 text-volt-500 dark:text-volt-400"></i> Private Progress Photo Journal
+              </h2>
+              <p class="text-xs text-gray-500 dark:text-gray-400">Stored locally on your device. Never uploaded or shared publicly.</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <input type="month" id="photo-filter-month" onchange="renderProgressPhotos()" class="px-3 py-1.5 rounded-full bg-gray-100 dark:bg-charcoal-800 border border-gray-200 dark:border-charcoal-700 text-xs" />
+              <button onclick="document.getElementById('photo-filter-month').value=''; renderProgressPhotos()" class="text-xs text-volt-600 dark:text-volt-400 hover:underline px-2 font-semibold">All Dates</button>
+              <label class="px-3.5 py-1.5 rounded-full bg-volt-400/15 text-volt-600 dark:text-volt-400 border border-volt-400/30 text-xs font-bold cursor-pointer hover:bg-volt-400/25 transition">
+                + Upload Gallery
+                <input type="file" accept="image/*" class="hidden" onchange="handleDirectPhotoUpload(event)" />
+              </label>
+            </div>
+          </div>
+
+          <!-- Interactive Before & After Comparison Tool -->
+          <div id="before-after-section" class="hidden elevated-box box-progress-before-after p-4 sm:p-5 space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <h3 class="text-sm font-bold text-volt-500 dark:text-volt-400 flex items-center gap-1.5">
+                <i data-lucide="columns" class="w-4 h-4"></i> Before & After Transformation Slider
+              </h3>
+              <div class="flex items-center gap-2 text-xs">
+                <select id="ba-before-select" onchange="updateBeforeAfterViewer()" class="px-2.5 py-1 rounded-lg bg-white dark:bg-charcoal-900 border border-gray-200 dark:border-charcoal-700"></select>
+                <span class="text-gray-400">vs</span>
+                <select id="ba-after-select" onchange="updateBeforeAfterViewer()" class="px-2.5 py-1 rounded-lg bg-white dark:bg-charcoal-900 border border-gray-200 dark:border-charcoal-700"></select>
+              </div>
+            </div>
+            <div class="max-w-md mx-auto">
+              <div id="ba-slider-box" class="ba-container box-progress-before-after-slider rounded-2xl aspect-[3/4] bg-charcoal-950 border border-charcoal-700">
+                <img id="ba-before-img" alt="Before" class="w-full h-full object-cover" />
+                <div id="ba-after-wrapper" class="ba-after" style="width: 50%;">
+                  <img id="ba-after-img" alt="After" class="w-full h-full object-cover max-w-none" />
+                </div>
+                <div id="ba-divider" class="absolute inset-y-0 w-0.5 bg-volt-400 shadow-[0_0_12px_#C5F02E]" style="left: 50%;">
+                  <div class="w-8 h-8 rounded-full bg-volt-400 text-charcoal-950 flex items-center justify-center font-extrabold text-xs -translate-x-1/2 top-1/2 -translate-y-1/2 relative shadow-lg">⇄</div>
+                </div>
+                <span id="ba-before-label" class="absolute bottom-3 left-3 px-2.5 py-1 rounded-full bg-charcoal-950/85 text-gray-200 text-[11px] font-semibold">Before</span>
+                <span id="ba-after-label" class="absolute bottom-3 right-3 px-2.5 py-1 rounded-full bg-volt-400 text-charcoal-950 text-[11px] font-extrabold">After</span>
+              </div>
+              <input type="range" min="0" max="100" value="50" oninput="slideBeforeAfter(this.value)" class="w-full mt-3 accent-yellow-400 cursor-ew-resize" />
+            </div>
+          </div>
+
+          <!-- Chronological Photo Grid -->
+          <div id="progress-photos-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3.5"></div>
+        </div>
+      </section>
+
+      <!-- ========================================================= -->
+      <!-- TAB 7: MONTHLY REPORT & AUTOMATIC PROGRESS VIDEO          -->
+      <!-- ========================================================= -->
+      <section id="tab-report" class="tab-section hidden space-y-6">
+        <div class="print-watermark hidden print-only">weGogym</div>
+
+        <!-- Top Controls -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 no-print">
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold">Monthly Report & Video</h1>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Executive monthly analytics document and cinematic transformation recap.</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <input type="month" id="report-month-picker" onchange="renderMonthlyReport()" class="px-3.5 py-2 rounded-full bg-white dark:bg-charcoal-900 border border-gray-200 dark:border-charcoal-700 text-xs font-semibold" />
+            <button onclick="window.print()" class="px-4 py-2 rounded-full bg-gray-100 dark:bg-charcoal-800 hover:bg-gray-200 dark:hover:bg-charcoal-700 border border-gray-200 dark:border-charcoal-700 text-xs font-semibold flex items-center gap-1.5 transition">
+              <i data-lucide="printer" class="w-3.5 h-3.5 text-volt-500 dark:text-volt-400"></i> Print Report
+            </button>
+            <button onclick="downloadReportPDF()" class="btn-primary px-4 py-2 text-xs flex items-center gap-1.5">
+              <i data-lucide="file-down" class="w-3.5 h-3.5"></i> Download PDF
+            </button>
+          </div>
+        </div>
+
+        <!-- AUTOMATIC MONTHLY PROGRESS VIDEO STUDIO -->
+        <div class="surface-card box-report-video-studio p-5 sm:p-6 border-volt-400/35 no-print space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-start gap-3">
+              <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-volt-300 to-volt-500 text-charcoal-950 flex items-center justify-center shrink-0">
+                <i data-lucide="film" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h2 class="text-lg font-extrabold">Monthly Transformation Video</h2>
+                  <span id="eom-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-volt-400 text-charcoal-950">End-of-Month Ready</span>
+                </div>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Compiles your chronological monthly photos with dates, smooth crossfades, and end-of-month stats.</p>
+              </div>
+            </div>
+          </div>
+
+          <div id="monthly-video-studio-body"></div>
+        </div>
+
+        <!-- Printable Report Document Container -->
+        <div id="printable-report-area" class="surface-card box-report-printable report-document p-6 sm:p-8 space-y-6">
+          <!-- Report Header with Logo & User Info -->
+          <div class="report-document-header flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-gray-200 dark:border-charcoal-700">
+            <div class="flex items-center gap-3">
+              <div class="report-document-mark w-11 h-11 rounded-2xl bg-gradient-to-br from-volt-300 to-volt-500 flex items-center justify-center">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F1115" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6.5 6.5h11M6.5 17.5h11M3 10v4M21 10v4M7 4v16M17 4v16" />
+                </svg>
+              </div>
+              <div>
+                <p class="report-document-kicker">Monthly Performance Dossier</p>
+                <h2 class="font-display font-extrabold text-xl">weGogym Performance Report</h2>
+                <p id="rep-subtitle-month" class="text-xs text-volt-600 dark:text-volt-400 font-bold"></p>
+              </div>
+            </div>
+            <div class="report-document-meta text-left sm:text-right text-xs text-gray-500 dark:text-gray-400">
+              <p id="rep-user-line" class="font-bold text-gray-900 dark:text-gray-100 text-sm"></p>
+              <p id="rep-generated-date"></p>
+            </div>
+          </div>
+
+          <!-- Monthly Overview KPIs -->
+          <section class="report-section report-section-overview">
+            <h3 class="report-section-title text-xs font-bold uppercase tracking-wider text-gray-400 mb-3"><span>01</span> Monthly Overview & Previous Month Comparison</h3>
+            <div id="rep-overview-grid" class="report-kpi-grid grid grid-cols-2 sm:grid-cols-5 gap-3"></div>
+          </section>
+
+          <!-- Body Measurements Comparison -->
+          <section class="report-section report-section-measurements">
+            <h3 class="report-section-title text-xs font-bold uppercase tracking-wider text-gray-400 mb-3"><span>02</span> Body Measurements (Start vs. End of Month)</h3>
+            <div id="rep-measurements-table" class="report-table-wrap overflow-x-auto"></div>
+          </section>
+
+          <!-- Personal Records & Performance -->
+          <section class="report-section report-section-prs">
+            <h3 class="report-section-title text-xs font-bold uppercase tracking-wider text-gray-400 mb-3"><span>03</span> Personal Records & Top Lifts</h3>
+            <div id="rep-prs-grid" class="report-pr-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+          </section>
+
+          <!-- Monthly Progress Photos -->
+          <section class="report-section report-section-photos">
+            <h3 class="report-section-title text-xs font-bold uppercase tracking-wider text-gray-400 mb-3"><span>04</span> Chronological Progress Photographs</h3>
+            <div id="rep-photos-grid" class="report-photos-grid grid grid-cols-2 sm:grid-cols-4 gap-3"></div>
+          </section>
+
+          <!-- Document Footer -->
+          <footer class="report-document-footer pt-4 border-t border-gray-200 dark:border-charcoal-700 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-[11px] text-gray-400">
+            <span>Generated by weGogym Fitness OS • Private Member Document</span>
+            <span>Designed & developed by Mohit SIngh Mahra • Page 1 of 1</span>
+          </footer>
+        </div>
+      </section>
+
+      <!-- ========================================================= -->
+      <!-- TAB 8: PROFILE & GOALS                                    -->
+      <!-- ========================================================= -->
+      <section id="tab-profile" class="tab-section hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold">Profile & Goals</h1>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Manage your biometrics, preferences, PWA installation, and local application data.</p>
+          </div>
+          <button onclick="loadDemoData()" class="px-4 py-2 rounded-full text-xs font-bold bg-volt-400/15 text-volt-600 dark:text-volt-400 border border-volt-400/35 hover:bg-volt-400/25 transition self-start flex items-center gap-1.5">
+            <i data-lucide="database" class="w-3.5 h-3.5"></i> Populate Sample Month Data
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <!-- Personal Info & Goals Form -->
+          <form onsubmit="saveUserProfile(event)" class="lg:col-span-7 surface-card box-profile-form p-5 sm:p-6 space-y-5">
+            <div class="flex items-center gap-4">
+              <div id="profile-avatar-preview" class="w-16 h-16 rounded-2xl bg-charcoal-800 border-2 border-volt-400 flex items-center justify-center overflow-hidden font-display font-extrabold text-xl text-volt-400">WG</div>
+              <div class="space-y-1.5">
+                <label class="px-3.5 py-1.5 rounded-full bg-gray-100 dark:bg-charcoal-800 border border-gray-200 dark:border-charcoal-700 text-xs font-semibold cursor-pointer hover:bg-gray-200 dark:hover:bg-charcoal-700 inline-flex items-center gap-1.5">
+                  <i data-lucide="upload" class="w-3.5 h-3.5 text-volt-500 dark:text-volt-400"></i> Upload Avatar
+                  <input type="file" accept="image/*" class="hidden" onchange="handleAvatarUpload(event)" />
+                </label>
+                <p class="text-[11px] text-gray-400">JPG, PNG or WebP stored locally (No account needed)</p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div>
+                <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Display Name</label>
+                <input type="text" id="prof-name" required class="w-full px-3.5 py-2 rounded-xl bg-gray-100 dark:bg-charcoal-800 border border-gray-200 dark:border-charcoal-700 text-sm" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Age (years)</label>
+                <input type="number" id="prof-age" min="13" max="100" class="w-full px-3.5 py-2 rounded-xl bg-gray-100 dark:bg-charcoal-800 border border-gray-200 dark:border-charcoal-700 text-sm" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Height (<span class="unit-length-label">cm</span>)</label>
+                <input type="number" step="0.1" id="prof-height" class="w-full px-3.5 py-2 rounded-xl bg-gray-100 dark:bg-charcoal-800 border border-gray-200 dark:border-charcoal-700 text-sm" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Current Weight (<span class="unit-weight-label">kg</span>)</label>
+                <input type="number" step="0.1" id="prof-weight" class="w-full px-3.5 py-2 rounded-xl bg-gray-100 dark:bg-charcoal-800 border border-gray-200 dark:border-charcoal-700 text-sm" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Target Weight (<span class="unit-weight-label">kg</span>)</label>
+                <input type="number" step="0.1" id="prof-target-weight" class="w-full px-3.5 py-2 rounded-xl bg-gray-100 dark:bg-charcoal-800 border border-gray-200 dark:border-charcoal-700 text-sm" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Primary Fitness Goal</label>
+                <select id="prof-goal" class="w-full px-3.5 py-2 rounded-xl bg-gray-100 dark:bg-charcoal-800 border border-gray-200 dark:border-charcoal-700 text-sm">
+                  <option value="Muscle Growth">Muscle Growth</option>
+                  <option value="Strength">Strength</option>
+                  <option value="Fat Loss">Fat Loss</option>
+                  <option value="Endurance">Endurance</option>
+                  <option value="Calisthenics">Calisthenics</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Experience Level</label>
+                <select id="prof-level" class="w-full px-3.5 py-2 rounded-xl bg-gray-100 dark:bg-charcoal-800 border border-gray-200 dark:border-charcoal-700 text-sm">
+                  <option value="Beginner">Beginner</option>
+                  <option value="Intermediate">Intermediate</option>
+                  <option value="Advanced">Advanced</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Preferred Training Time</label>
+                <input type="time" id="prof-schedule-time" class="w-full px-3.5 py-2 rounded-xl bg-gray-100 dark:bg-charcoal-800 border border-gray-200 dark:border-charcoal-700 text-sm" />
+              </div>
+            </div>
+
+            <button type="submit" class="btn-primary inline-flex w-auto items-center gap-2 px-5 py-2 text-sm">
+              <i data-lucide="check" class="w-4 h-4"></i> Save Profile & Goals
+            </button>
+          </form>
+
+          <!-- Progress Summary + App Settings -->
+          <div class="lg:col-span-5 space-y-5">
+            <!-- Nutrition targets: calculated from this profile; shown on the Dashboard -->
+            <div class="surface-card box-profile-nutrition p-5 sm:p-6 space-y-4" id="profile-nutrition-card">
+              <div class="flex items-center justify-between gap-2">
+                <h2 class="text-lg font-bold">Nutrition Targets</h2>
+                <span class="text-xs font-semibold text-volt-600 dark:text-volt-400" data-nut="goal-name">Maintenance</span>
+              </div>
+              <div class="grid grid-cols-2 gap-3 text-sm">
+                <div class="box-profile-nutrition-calories rounded-xl bg-gray-100 dark:bg-charcoal-800 border border-gray-200 dark:border-charcoal-700 p-3">
+                  <p class="text-[11px] text-gray-500 dark:text-gray-400">Calories</p>
+                  <p class="font-extrabold text-lg"><span data-nut="kcal">—</span> <span class="text-xs font-semibold">kcal</span></p>
+                </div>
+                <div class="box-profile-nutrition-protein rounded-xl bg-gray-100 dark:bg-charcoal-800 border border-gray-200 dark:border-charcoal-700 p-3">
+                  <p class="text-[11px] text-gray-500 dark:text-gray-400">Protein</p>
+                  <p class="font-extrabold text-lg"><span data-nut="protein">—</span> <span class="text-xs font-semibold">g</span></p>
+                </div>
+                <div class="box-profile-nutrition-carbs rounded-xl bg-gray-100 dark:bg-charcoal-800 border border-gray-200 dark:border-charcoal-700 p-3">
+                  <p class="text-[11px] text-gray-500 dark:text-gray-400">Carbs</p>
+                  <p class="font-extrabold text-lg"><span data-nut="carbs">—</span> <span class="text-xs font-semibold">g</span></p>
+                </div>
+                <div class="box-profile-nutrition-fat rounded-xl bg-gray-100 dark:bg-charcoal-800 border border-gray-200 dark:border-charcoal-700 p-3">
+                  <p class="text-[11px] text-gray-500 dark:text-gray-400">Fat</p>
+                  <p class="font-extrabold text-lg"><span data-nut="fat">—</span> <span class="text-xs font-semibold">g</span></p>
+                </div>
+              </div>
+              <p class="text-xs text-gray-500 dark:text-gray-400">BMR <span class="font-bold" data-nut="bmr">—</span> kcal · TDEE <span class="font-bold" data-nut="tdee">—</span> kcal · <span data-nut="adj-text">—</span></p>
+              <details class="pt-2 border-t border-gray-200 dark:border-charcoal-700">
+                <summary class="cursor-pointer text-sm font-semibold flex items-center gap-2">
+                  <i data-lucide="sliders-horizontal" class="w-4 h-4 text-volt-500 dark:text-volt-400"></i> Advanced Nutrition Settings
+                </summary>
+                <div class="grid grid-cols-2 gap-4 mt-3 text-sm">
+                  <div class="space-y-2">
+                    <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400">Protein (g/kg)</label>
+                    <input type="range" id="protein-factor-slider" min="1.0" max="3.0" step="0.1" value="2.0" class="w-full accent-volt-500" />
+                    <input type="number" id="protein-factor-num" min="1.0" max="3.0" step="0.1" value="2.0" class="w-full px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-charcoal-800 border border-gray-200 dark:border-charcoal-700 text-sm" />
+                    <span id="protein-factor-display" class="text-xs text-gray-400">2.0 g/kg</span>
+                  </div>
+                  <div class="space-y-2">
+                    <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400">Fat (g/kg)</label>
+                    <input type="range" id="fat-factor-slider" min="0.4" max="1.2" step="0.05" value="0.8" class="w-full accent-volt-500" />
+                    <input type="number" id="fat-factor-num" min="0.4" max="1.2" step="0.05" value="0.8" class="w-full px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-charcoal-800 border border-gray-200 dark:border-charcoal-700 text-sm" />
+                    <span id="fat-factor-display" class="text-xs text-gray-400">0.8 g/kg</span>
+                  </div>
+                </div>
+                <p class="text-[11px] text-gray-400 mt-3">Protein is kept within the range for your goal; values outside it use the goal default.</p>
+              </details>
+            </div>
+            <div class="surface-card box-profile-summary p-5 sm:p-6 space-y-3">
+              <h2 class="text-lg font-bold">Overall Progress Summary</h2>
+              <div id="profile-progress-summary" class="space-y-2.5 text-sm"></div>
+            </div>
+
+            <div class="surface-card box-profile-preferences p-5 sm:p-6 space-y-4">
+              <h2 class="text-lg font-bold">Preferences & PWA App</h2>
+
+              <div class="flex items-center justify-between py-1">
+                <div>
+                  <p class="text-sm font-semibold">Appearance Theme</p>
+                  <p class="text-xs text-gray-400">Charcoal Silver Dark or Alabaster Light</p>
+                </div>
+                <button onclick="toggleTheme()" class="px-4 py-2 rounded-full bg-gray-100 dark:bg-charcoal-800 border border-gray-200 dark:border-charcoal-700 text-xs font-bold text-volt-600 dark:text-volt-400">
+                  Switch Theme
+                </button>
+              </div>
+
+              <div class="flex items-center justify-between py-1">
+                <div>
+                  <p class="text-sm font-semibold">Measurement Units</p>
+                  <p class="text-xs text-gray-400">Auto-converts all weights & sizes</p>
+                </div>
+                <div class="flex rounded-full bg-gray-100 dark:bg-charcoal-800 p-1 border border-gray-200 dark:border-charcoal-700">
+                  <button onclick="setUnits('metric')" id="unit-btn-metric" class="px-3 py-1 rounded-full text-xs font-bold transition">kg / cm</button>
+                  <button onclick="setUnits('imperial')" id="unit-btn-imperial" class="px-3 py-1 rounded-full text-xs font-bold transition">lbs / in</button>
+                  <button onclick="setUnits('stone')" id="unit-btn-stone" class="px-3 py-1 rounded-full text-xs font-bold transition">st / cm</button>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between py-1">
+                <div>
+                  <p class="text-sm font-semibold">Workout Reminders</p>
+                  <p class="text-xs text-gray-400">Daily schedule notification cue</p>
+                </div>
+                <input type="checkbox" id="pref-reminders" onchange="toggleReminderSetting(this.checked)" class="w-5 h-5 accent-yellow-400 rounded" />
+              </div>
+
+              <div class="pt-2 border-t border-gray-200 dark:border-charcoal-700 space-y-2">
+                <!-- GitHub URL is configured once in app.js (GITHUB_REPOSITORY_URL). -->
+                <button onclick="openGitHubRepo()" data-github-repo class="github-repo-button w-full py-2.5 text-xs flex items-center justify-center gap-2">
+                  <i data-lucide="code" class="w-4 h-4"></i> View GitHub Repository
+                </button>
+                <button onclick="triggerInstallPWA()" data-install-button class="w-full py-2.5 rounded-full bg-volt-400/15 text-volt-600 dark:text-volt-400 border border-volt-400/35 font-bold text-xs flex items-center justify-center gap-2 hover:bg-volt-400/25 transition">
+                  <i data-lucide="smartphone" class="w-4 h-4"></i> <span data-install-label>Install weGogym App</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reset Zone (No Account Deletion since No Login Exists) -->
+        <div class="surface-card box-profile-reset p-5 sm:p-6 border-rose-500/30 bg-rose-500/[0.03]">
+          <div class="flex items-center gap-2 text-rose-500 mb-2">
+            <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+            <h2 class="text-lg font-extrabold">Reset Zone</h2>
+          </div>
+          <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Destructive actions permanently erase selected records from local storage. Confirmation is required.</p>
+          <div class="flex flex-wrap gap-2.5">
+            <button onclick="confirmDestructiveAction('workouts')" class="px-4 py-2 rounded-full text-xs font-semibold border border-rose-500/30 text-rose-500 hover:bg-rose-500/10 transition">Reset Workout History</button>
+            <button onclick="confirmDestructiveAction('measurements')" class="px-4 py-2 rounded-full text-xs font-semibold border border-rose-500/30 text-rose-500 hover:bg-rose-500/10 transition">Reset Body Measurements</button>
+            <button onclick="confirmDestructiveAction('photos')" class="px-4 py-2 rounded-full text-xs font-semibold border border-rose-500/30 text-rose-500 hover:bg-rose-500/10 transition">Delete Progress Photos</button>
+            <button onclick="confirmDestructiveAction('all')" class="px-4 py-2 rounded-full text-xs font-bold bg-rose-600 text-white hover:bg-rose-700 transition">Reset All App Data</button>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Mobile Floating Bottom Pill Navigation -->
+  <nav id="mobile-bottom-nav" class="lg:hidden fixed bottom-3 inset-x-3 z-40 bg-charcoal-950/90 backdrop-blur-xl border-2 border-volt-400/40 rounded-full px-2 py-1.5 shadow-[0_14px_34px_rgba(0,0,0,0.85)] flex items-center justify-around">
+    <!-- Rendered dynamically with 4 primary tabs + More menu -->
+  </nav>
+
+  <!-- Mobile "More" Drawer Sheet -->
+  <div id="mobile-more-drawer" class="hidden fixed inset-0 z-50 bg-charcoal-950/75 backdrop-blur-sm flex items-end lg:hidden" onclick="if(event.target===this) toggleMobileMore(false)">
+    <div class="w-full bg-white dark:bg-charcoal-900 rounded-t-3xl p-6 border-t border-charcoal-700 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="font-display font-extrabold text-lg">All Navigation Tabs</h3>
+        <button onclick="toggleMobileMore(false)" class="p-2 rounded-full bg-gray-100 dark:bg-charcoal-800">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <div id="mobile-more-grid" class="grid grid-cols-2 gap-2.5"></div>
     </div>
   </div>
 
-  <script src="js/storage.js" defer></script>
-  <script src="js/goal-templates.js"></script><script src="js/data.js" defer></script>
-  <script src="js/app.js" defer></script>
-  <script src="js/dashboard.js" defer></script>
-  <script src="js/pwa.js" defer></script>
+  <!-- Universal Modal Backdrop -->
+  <div id="modal-backdrop" class="hidden fixed inset-0 z-50 bg-charcoal-950/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto" onclick="if(event.target===this) closeModal()">
+    <div id="modal-content" class="bg-white dark:bg-charcoal-900 border border-gray-200 dark:border-charcoal-700 rounded-3xl max-w-lg w-full p-6 shadow-2xl my-auto max-h-[90vh] overflow-y-auto"></div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- JAVASCRIPT APPLICATION ENGINE                                         -->
+  <!-- ===================================================================== -->
+  <script src="app.js"></script>
 </body>
 </html>
+<script>
+/**
+ * Theme Toggle Function
+ * Toggles between light and dark mode, persists preference to localStorage
+ */
+function toggleTheme() {
+  const html = document.documentElement;
+  const themeLabel = document.getElementById('sidebar-theme-label');
 
+  if (html.classList.contains('dark')) {
+    html.classList.remove('dark');
+    localStorage.setItem('theme', 'light');
+    if (themeLabel) themeLabel.textContent = 'Dark Mode';
+  } else {
+    html.classList.add('dark');
+    localStorage.setItem('theme', 'dark');
+    if (themeLabel) themeLabel.textContent = 'Light Mode';
+  }
+}
+
+// Check for saved theme preference or system preference
+document.addEventListener('DOMContentLoaded', function() {
+  const savedTheme = localStorage.getItem('theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+  // Use saved preference, fall back to system preference
+  const themeToApply = savedTheme ? savedTheme : (prefersDark ? 'dark' : 'light');
+
+  if (themeToApply === 'dark') {
+    document.documentElement.classList.add('dark');
+  }
+
+  // Listen for system theme changes
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    if (!localStorage.getItem('theme')) {
+      const newTheme = e.matches ? 'dark' : 'light';
+      document.documentElement.classList.toggle('dark', newTheme === 'dark');
+    }
+  });
+});
+</script>
