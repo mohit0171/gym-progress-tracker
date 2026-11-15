@@ -1,0 +1,27 @@
+{
+  "id": "./",
+  "name": "weGogym — Performance OS",
+  "short_name": "weGogym",
+  "description": "Workout planning, gym session logging, body progress analytics, and a private transformation journal.",
+  "lang": "en",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#171A19",
+  "theme_color": "#1B5E3B",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
