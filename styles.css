@@ -1601,3 +1601,82 @@ html.dark #printable-report-area .report-table-wrap {
 #toast-container > div.text-rose-300 span {
   color: #FDA4AF !important;
 }
+
+
+/* =========================================================
+   Welcome hero banner: fixed light text on the dark banner,
+   independent of light/dark theme rules.
+   ========================================================= */
+#welcome-hero-banner h2 {
+  color: #FFFFFF !important;
+}
+
+#welcome-hero-banner h2 span {
+  color: #C5F02E !important;
+}
+
+#welcome-hero-banner p {
+  color: #D1D5DB !important;
+}
+
+/* Volt badge: dark text on lime */
+#welcome-hero-banner span.bg-volt-400 {
+  color: #101312 !important;
+}
+
+/* Encrypted badge: readable light text */
+#welcome-hero-banner span.bg-charcoal-800 {
+  color: #E5E7EB !important;
+  background-color: #202523 !important;
+  border-color: #3A413E !important;
+}
+
+/* Secondary button (Hide banner) */
+#welcome-hero-banner button:not(.bg-volt-400):not([class*="bg-sage"]) {
+  color: #E5E7EB !important;
+  background-color: #2A302D !important;
+}
+
+/* =========================================================
+   Welcome hero banner: fixed colours on the dark card.
+   The #welcome-hero-banner ID outranks the global text rules.
+   ========================================================= */
+#welcome-hero-banner {
+  background-color: #171A19 !important;   /* charcoal-900 */
+}
+
+#welcome-hero-banner h2 {
+  color: #FFFFFF !important;
+  text-shadow: none;
+}
+
+#welcome-hero-banner h2 span {
+  color: #C5F02E !important;              /* volt accent */
+}
+
+#welcome-hero-banner p {
+  color: #D1D5DB !important;              /* gray-300 */
+}
+
+/* "Instant Access" pill: dark text on the lime background */
+#welcome-hero-banner span.bg-volt-400 {
+  color: #101312 !important;              /* charcoal-950 */
+}
+
+/* "Encrypted On-Device Storage" pill */
+#welcome-hero-banner span.bg-charcoal-800 {
+  color: #D1D5DB !important;
+  background-color: #202523 !important;   /* charcoal-800 */
+  border-color: #2A302D !important;       /* charcoal-700 */
+}
+
+/* "Hide Banner" button */
+#welcome-hero-banner button.bg-charcoal-800 {
+  color: #D1D5DB !important;
+  background-color: #202523 !important;
+}
+
+/* "Build Workout Plan" button keeps its white text */
+#welcome-hero-banner button.btn-primary {
+  color: #FFFFFF !important;
+}
