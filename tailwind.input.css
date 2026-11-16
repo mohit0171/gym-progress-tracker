@@ -1,0 +1,101 @@
+/* ==========================================================================
+   weGogym Tailwind Input CSS
+   Source file for `npm run build:css` (tailwindcss -c tailwind-config.js -i ... -o styles.tailwind.css)
+   Defines all CSS custom properties referenced by tailwind-config.js
+   ========================================================================== */
+
+:root {
+  /* Volt/Accent (Forest Green #1B5E3B) — used by Tailwind config color.volt */
+  --volt-400: 27 94 59;
+
+  /* Ice/Yellow (Lime #C5F02E) — used by Tailwind config color.ice */
+  --ice-400: 197 240 46;
+
+  /* Semantic tokens (mirror of styles.css variables) */
+  --color-bg: #F5EEDC;
+  --color-card: #FFF9EA;
+  --color-accent: #1B5E3B;
+  --color-highlight: #C5F02E;
+  --color-text: #173523;
+  --color-espresso: #12452B;
+
+  /* Tailwind-compatible palette tokens (light theme) */
+  --color-sage-50: #F4F8F1;
+  --color-sage-100: #E5F0E0;
+  --color-sage-200: #C9DEC2;
+  --color-sage-300: #A5C99C;
+  --color-sage-400: #78A86C;
+  --color-sage-500: #4C8A52;
+  --color-sage-600: #2F7042;
+  --color-sage-700: #1B5E3B;
+  --color-sage-800: #174A31;
+  --color-sage-900: #123723;
+
+  --color-offwhite-50: #FFFDF5;
+  --color-offwhite-100: #FFF9EA;
+  --color-offwhite-200: #F2E7CE;
+
+  /* Light theme semantics */
+  --bg-app: var(--color-bg);
+  --bg-surface: var(--color-card);
+  --bg-elevated: #F2E7CE;
+  --text-primary: #173523;
+  --text-secondary: #315240;
+  --text-inverse: #FFFFFF;
+  --theme-dot: rgba(27, 94, 59, 0.10);
+  --theme-accent-soft: rgba(27, 94, 59, 0.14);
+  --theme-accent-glow: rgba(27, 94, 59, 0.18);
+
+  --color-primary: var(--color-accent);
+  --color-accent-lime: var(--color-accent);
+  --color-accent-tangerine: var(--color-accent);
+  --color-accent-forest: var(--color-accent);
+
+  --border-subtle: rgba(23, 53, 35, 0.18);
+  --border-muted: rgba(23, 53, 35, 0.11);
+  --card-shadow: 4px 4px 0 rgba(23, 53, 35, 0.16);
+  --btn-shadow: 3px 3px 0 #173523;
+
+  /* Anatomy figure & macro bars */
+  --mf-body: #E2E9DC;
+  --mf-muscle: #C8D9C1;
+  --mf-stroke: rgba(23, 53, 35, 0.16);
+  --mf-primary: #1B5E3B;
+  --mf-secondary: rgba(27, 94, 59, 0.38);
+  --demo-skin: #8D5B4C;
+  --demo-skin-far: #6F4538;
+  --demo-shoe: #173523;
+  --demo-shadow: rgba(23, 53, 35, 0.18);
+
+  --macro-1: #1B5E3B;
+  --macro-2: #4C8A52;
+  --macro-3: #315240;
+
+  /* Card palette preserving theme */
+  --card-a-bg: #FFF9EA; --card-a-ink: #173523; --card-a-btn: #1B5E3B; --card-a-btn-ink: #FFFFFF;
+  --card-b-bg: #F5ECD6; --card-b-ink: #173523; --card-b-btn: #1B5E3B; --card-b-btn-ink: #FFFFFF;
+  --card-c-bg: #EAF2E4; --card-c-ink: #173523; --card-c-btn: #1B5E3B; --card-c-btn-ink: #FFFFFF;
+}
+
+/* Dark theme overrides */
+html.dark {
+  --color-bg: #171A19;
+  --color-card: #202523;
+  --color-cream: #F4F7F2;
+  --color-accent: #C5F02E;
+  --color-highlight: #C5F02E;
+  --color-text: #F4F7F2;
+
+  --color-navy-50: #F4F7F2;
+  --color-navy-100: #E2E8E2;
+  --color-navy-200: #C8D1C9;
+  --color-navy-300: #AAB6AC;
+  --color-navy-400: #7E8A80;
+  --color-navy-500: #59645C;
+  --color-navy-600: #3D4741;
+  --color-navy-700: #2B332E;
+
+  --bg-app: var(--color-bg);
+  --bg-surface: var(--color-card);
+}
+
