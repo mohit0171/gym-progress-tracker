@@ -1,39 +1,28 @@
 
 {
   "id": "/weGogym/",
-  "name": "weGogym",
+  "name": "weGogym — Performance OS",
   "short_name": "weGogym",
-  "description": "Your personal fitness and workout tracking app.",
+  "description": "Workout planning, gym session logging, body progress analytics, and a private transformation journal.",
+  "lang": "en",
   "start_url": "/weGogym/",
   "scope": "/weGogym/",
   "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#0B0F14",
-  "theme_color": "#0B0F14",
-  "categories": [
-    "health",
-    "fitness",
-    "lifestyle"
-  ],
-  "prefer_related_applications": false,
+  "orientation": "portrait-primary",
+  "background_color": "#171A19",
+  "theme_color": "#1B5E3B",
   "icons": [
     {
-      "src": "/weGogym/icons/icon-192.png",
+      "src": "icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/weGogym/icons/icon-512.png",
+      "src": "icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/weGogym/icons/icon-512-maskable.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any maskable"
     }
   ]
 }
