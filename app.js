@@ -216,7 +216,8 @@
       activeSession: null, // In-progress workout session
       measurements: [], // { id, date, weightKg, bodyFat, chestCm, armsCm, waistCm, thighsCm, shouldersCm, calvesCm }
       photos: [],       // { id, date, dataUrl, note, workoutId }
-      favorites: ['ex_bench_press', 'ex_pullups', 'ex_back_squat']
+      favorites: ['ex_bench_press', 'ex_pullups', 'ex_back_squat'],
+      customExercises: []
     };
 
     /*************************************************************************
@@ -340,6 +341,15 @@
 
 
     let db = loadDB();
+    syncCustomExercises();
+
+    // Custom exercises live in db.customExercises; mirror them into EXERCISE_DB.
+    function syncCustomExercises() {
+      for (let i = EXERCISE_DB.length - 1; i >= 0; i--) {
+        if (EXERCISE_DB[i].custom) EXERCISE_DB.splice(i, 1);
+      }
+      (db.customExercises || []).forEach(ex => EXERCISE_DB.push({ ...ex, custom: true }));
+    }
 
     function loadDB() {
       try {
@@ -620,6 +630,7 @@
       if (tabId === 'progress') renderBodyProgressTab();
       if (tabId === 'report') renderMonthlyReport();
       if (tabId === 'profile') renderProfileTab();
+      refreshChartThemes();
     }
 
     function switchTab(tabId) {
@@ -671,6 +682,33 @@
       window.setTimeout(revealTarget, 170);
     }
 
+    function isDarkMode() {
+      return document.documentElement.classList.contains('dark') || db.settings.theme === 'dark';
+    }
+
+    // Chart axis labels: pure white in dark theme, the existing slate grey in light theme.
+    function chartTextColor() {
+      return isDarkMode() ? '#FFFFFF' : '#4B5563';
+    }
+
+    function chartGridColor() {
+      return isDarkMode() ? 'rgba(255, 255, 255, 0.16)' : 'rgba(17, 24, 39, 0.08)';
+    }
+
+    // Re-colour any charts already on screen when the theme changes.
+    function refreshChartThemes() {
+      if (typeof Chart !== 'undefined') Chart.defaults.color = chartTextColor();
+      [dashboardChartInstance, bodyProgressChartInstance].forEach(chart => {
+        if (!chart) return;
+        ['x', 'y'].forEach(axis => {
+          const scale = chart.options.scales[axis];
+          scale.ticks.color = () => chartTextColor();
+          if (scale.grid && axis === 'y') scale.grid.color = () => chartGridColor();
+        });
+        chart.update('none');
+      });
+    }
+
     function applyThemeAndUnits() {
       const isDark = db.settings.theme === 'dark';
       document.documentElement.classList.toggle('dark', isDark);
@@ -686,6 +724,7 @@
       document.querySelectorAll('.unit-length-label').forEach(el => el.textContent = lUnit);
       const badge = document.getElementById('sidebar-unit-badge');
       if (badge) badge.textContent = `${wUnit.toUpperCase()} / ${lUnit.toUpperCase()}`;
+      refreshChartThemes();
     }
 
     function toggleTheme() {
@@ -1001,8 +1040,7 @@
       }
 
       if (dashboardChartInstance) dashboardChartInstance.destroy();
-      const isDark = db.settings.theme === 'dark' || document.documentElement.classList.contains('dark');
-
+      
       dashboardChartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -1025,12 +1063,12 @@
           scales: {
             y: {
               beginAtZero: true,
-              grid: { color: isDark ? 'rgba(229, 231, 235, 0.16)' : 'rgba(17, 24, 39, 0.08)' },
-              ticks: { color: isDark ? '#E5E7EB' : '#4B5563', font: { size: 11 } }
+              grid: { color: () => chartGridColor() },
+              ticks: { color: () => chartTextColor(), font: { size: 11 } }
             },
             x: {
               grid: { display: false },
-              ticks: { color: isDark ? '#E5E7EB' : '#4B5563', font: { size: 11 } }
+              ticks: { color: () => chartTextColor(), font: { size: 11 } }
             }
           }
         }
@@ -1176,6 +1214,9 @@
                       </div>
                     `).join('')}
                   </div>
+                  <button onclick="openMuscleAddModal('day', '${esc(day)}')" class="add-exercise-btn add-exercise-btn--block">
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Exercise
+                  </button>
                 </div>
               `;
             }).join('')}
@@ -2191,6 +2232,7 @@
                   ${muscleFigureSVG(ex, { mini: true })}
                 </div>
                 <div class="flex items-center gap-1.5">
+                  ${ex.custom ? '<span class="custom-badge">Custom</span>' : ''}
                   <span class="px-2.5 py-1 rounded-full bg-gray-100 dark:bg-charcoal-800 text-[10px] font-bold text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-charcoal-700">${esc(ex.difficulty)}</span>
                   <button onclick="toggleFavoriteExercise('${esc(ex.id)}')" class="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-charcoal-800 transition" title="Favorite">
                     <i data-lucide="heart" class="w-4 h-4 ${isFav ? 'fill-volt-400 text-volt-400' : 'text-gray-400'}"></i>
@@ -2202,9 +2244,12 @@
               <p class="text-[11px] text-gray-400 mt-1">${esc(ex.category)} • ${esc(ex.equipment)}</p>
             </div>
 
-            <div class="flex items-center gap-2 pt-3 border-t border-gray-200 dark:border-charcoal-700">
+            <div class="flex flex-wrap items-center gap-2 pt-3 border-t border-gray-200 dark:border-charcoal-700">
               <button onclick="openExerciseDetailModal('${esc(ex.id)}')" class="flex-1 py-2 rounded-full bg-gray-100 dark:bg-charcoal-800 hover:bg-gray-200 dark:hover:bg-charcoal-700 text-xs font-bold transition">
                 Form & Details
+              </button>
+              <button onclick="openCreateExerciseModal('library')" class="add-exercise-btn">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Exercise
               </button>
               <button onclick="openAddExerciseToPlanModal('${esc(ex.id)}')" class="px-3.5 py-2 rounded-full bg-volt-400 text-charcoal-950 text-xs font-extrabold transition hover:opacity-90">
                 + Plan
@@ -2243,6 +2288,14 @@
       return `https://www.youtube.com/results?search_query=${encodeURIComponent(ex.name + ' proper form')}`;
     }
 
+    function renderTextBlock(text) {
+      const lines = String(text ?? '').split('\n').map(l => l.trim()).filter(Boolean);
+      if (lines.length <= 1) {
+        return `<p class="text-slate-600 dark:text-slate-300 leading-relaxed">${esc(lines[0] || '')}</p>`;
+      }
+      return `<ul class="text-bullets">${lines.map(l => `<li>${esc(l)}</li>`).join('')}</ul>`;
+    }
+
     function openExerciseDetailModal(exId) {
       const ex = EXERCISE_DB.find(e => e.id === exId);
       if (!ex) return;
@@ -2250,8 +2303,8 @@
         <div class="space-y-4">
           <div class="flex items-start justify-between gap-2">
             <div>
-              <span class="text-xs font-bold text-ice-400 uppercase">${ex.category} • ${ex.equipment}</span>
-              <h3 class="text-xl font-extrabold mt-0.5">${ex.name}</h3>
+              <span class="text-xs font-bold text-ice-400 uppercase">${esc(ex.category)} • ${esc(ex.equipment)}</span>
+              <h3 class="text-xl font-extrabold mt-0.5">${esc(ex.name)}</h3>
             </div>
             <button onclick="closeModal()" aria-label="Close" class="p-2 rounded-full bg-gray-100 dark:bg-charcoal-800 text-gray-700 dark:text-gray-200 hover:text-volt-500"><i data-lucide="x" class="w-4 h-4"></i></button>
           </div>
@@ -2260,37 +2313,38 @@
           <div class="grid grid-cols-2 gap-2.5 text-xs">
             <div class="elevated-box p-3">
               <p class="text-slate-400">Primary Target</p>
-              <p class="font-bold mt-0.5">${ex.target}</p>
+              <p class="font-bold mt-0.5">${esc(ex.target)}</p>
             </div>
             <div class="elevated-box p-3">
               <p class="text-slate-400">Recommended</p>
-              <p class="font-bold text-ice-400 mt-0.5">${ex.setsReps}</p>
+              <p class="font-bold text-ice-400 mt-0.5">${esc(ex.setsReps)}</p>
             </div>
           </div>
 
           <div class="text-xs">
             <p class="text-slate-400 font-semibold">Secondary Muscles</p>
-            <p class="mt-0.5">${ex.secondary}</p>
+            <p class="mt-0.5">${esc(ex.secondary)}</p>
           </div>
 
           <div class="elevated-box p-3.5 text-xs space-y-2">
             <p class="font-bold text-volt-600 dark:text-volt-400">How To Perform</p>
-            <ol class="mf-steps">${(ex.steps || []).map(st => `<li>${st}</li>`).join('')}</ol>
+            <ol class="mf-steps">${(ex.steps || []).map(st => `<li>${esc(st)}</li>`).join('')}</ol>
             <a href="${videoWatchURL(ex)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-xs font-bold text-volt-600 dark:text-volt-400 hover:underline">Search form on YouTube &#8599;</a>
           </div>
           <div class="elevated-box p-3.5 text-xs space-y-1">
             <p class="font-bold text-emerald-400">Execution Instructions</p>
-            <p class="text-slate-600 dark:text-slate-300 leading-relaxed">${ex.instructions}</p>
+            ${renderTextBlock(ex.instructions)}
           </div>
 
           <div class="elevated-box p-3.5 text-xs space-y-1 border-rose-400/25">
             <p class="font-bold text-rose-400">Common Mistakes to Avoid</p>
-            <p class="text-slate-600 dark:text-slate-300 leading-relaxed">${ex.mistakes}</p>
+            ${renderTextBlock(ex.mistakes)}
           </div>
 
           <button onclick="closeModal(); openAddExerciseToPlanModal('${ex.id}')" class="btn-primary w-full py-3 text-xs font-bold">
             + Add to Workout Plan
           </button>
+          ${ex.custom ? `<button onclick="deleteCustomExercise('${esc(ex.id)}')" class="w-full py-2.5 rounded-full text-xs font-bold text-rose-400 border border-rose-400/40">Delete Custom Exercise</button>` : ''}
         </div>
       `);
     }
@@ -2313,7 +2367,7 @@
       openModal(`
         <div class="space-y-4">
           <div class="flex items-center justify-between">
-            <h3 class="text-lg font-extrabold">Add "${ex.name}" to Plan</h3>
+            <h3 class="text-lg font-extrabold">Add "${esc(ex.name)}" to Plan</h3>
             <button onclick="closeModal()" aria-label="Close" class="p-2 rounded-full bg-gray-100 dark:bg-charcoal-800 text-gray-700 dark:text-gray-200 hover:text-volt-500"><i data-lucide="x" class="w-4 h-4"></i></button>
           </div>
           <p class="text-xs text-slate-400">Choose which day of <strong>${targetPlan.name}</strong> to append this exercise to:</p>
@@ -2332,7 +2386,323 @@
       `);
     }
 
-    function confirmAddExerciseToPlanDay(exId, day) {
+    /*************************************************************************
+     * 10b. ADD EXERCISE BY MUSCLE (tap a muscle on the figure to browse exercises)
+     *************************************************************************/
+    let muscleAddContext = { mode: 'library', day: null };
+
+    function openMuscleAddModal(mode, day = null) {
+      if (mode === 'day') {
+        const plan = db.planBuilder.draftPlan || db.activePlan;
+        if (!plan || !plan.days[day]) {
+          showToast('Generate a workout plan first.', 'error');
+          return;
+        }
+      }
+      muscleAddContext = { mode, day };
+
+      const subtitle = mode === 'day'
+        ? `Adding to <strong>${esc(day)}</strong>`
+        : 'Pick a muscle, then add an exercise to your plan';
+
+      openModal(`
+        <div class="space-y-4">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <span class="text-xs font-bold text-ice-400 uppercase">Add Exercise</span>
+              <h3 class="text-xl font-extrabold mt-0.5">Choose a Muscle</h3>
+              <p class="text-xs text-slate-400 mt-0.5">${subtitle}</p>
+            </div>
+            <button onclick="closeModal()" aria-label="Close" class="p-2 rounded-full bg-gray-100 dark:bg-charcoal-800 text-gray-700 dark:text-gray-200 hover:text-volt-500"><i data-lucide="x" class="w-4 h-4"></i></button>
+          </div>
+
+          <div class="mf-figure-wrap">
+            <figure class="mf-figure">${mfPickerViewSVG('front')}<figcaption>Front</figcaption></figure>
+            <figure class="mf-figure">${mfPickerViewSVG('back')}<figcaption>Back</figcaption></figure>
+          </div>
+
+          <p id="muscle-add-label" class="mf-muscle-list">Tap a muscle to see exercises</p>
+          <div id="muscle-add-list" class="space-y-2 max-h-72 overflow-y-auto">
+            <p class="text-xs text-slate-400 text-center py-3">Tap a highlighted muscle above.</p>
+          </div>
+          <button onclick="openCreateExerciseModal(muscleAddContext.mode, muscleAddContext.day)" class="add-exercise-btn add-exercise-btn--block"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Create new exercise</button>
+        </div>
+      `);
+    }
+
+    function mfPickerViewSVG(view) {
+      const muscles = view === 'front' ? MF_FRONT : MF_BACK;
+      const body = MF_BODY_LEFT.map(d => mfPair(d, 'mf-body')).join('') + `<g class="mf-body">${MF_HEAD}</g>`;
+      const parts = muscles.map(m => {
+        const attrs = `class="mf-muscle mf-pick" data-muscle="${m.key}" onclick="selectMuscleForAdd('${m.key}')"`;
+        const right = m.center ? '' : `<path ${attrs} d="${m.d}" transform="matrix(-1 0 0 1 200 0)"/>`;
+        return `<path ${attrs} d="${m.d}"/>${right}`;
+      }).join('');
+      return `<svg class="mf-svg" viewBox="0 0 200 400" role="img" aria-label="${view} muscle picker"><g>${body}</g><g>${parts}</g></svg>`;
+    }
+
+    function exercisesForMuscle(key) {
+      return EXERCISE_DB
+        .map(ex => {
+          const { primary, secondary } = getExerciseMuscles(ex);
+          if (primary.has(key)) return { ex, rank: 0 };
+          if (secondary.has(key)) return { ex, rank: 1 };
+          return null;
+        })
+        .filter(Boolean)
+        .sort((a, b) => a.rank - b.rank)
+        .map(r => r.ex);
+    }
+
+    function selectMuscleForAdd(key) {
+      document.querySelectorAll('.mf-pick').forEach(el => {
+        el.classList.toggle('is-chosen', el.dataset.muscle === key);
+      });
+      document.getElementById('muscle-add-label').textContent = MUSCLE_LABELS[key] || key;
+
+      const list = document.getElementById('muscle-add-list');
+      const exs = exercisesForMuscle(key);
+      if (exs.length === 0) {
+        list.innerHTML = `<p class="text-xs text-slate-400 text-center py-3">No exercises tagged for ${esc(MUSCLE_LABELS[key] || key)} yet.</p>`;
+        return;
+      }
+
+      const isDay = muscleAddContext.mode === 'day';
+      list.innerHTML = exs.map(ex => {
+        const isPrimary = getExerciseMuscles(ex).primary.has(key);
+        const action = isDay
+          ? `confirmAddExerciseToPlanDay('${ex.id}', '${muscleAddContext.day}', true)`
+          : `openAddExerciseToPlanModal('${ex.id}')`;
+        return `
+          <div class="elevated-box p-3 flex items-center justify-between gap-2">
+            <div class="min-w-0">
+              <p class="text-xs font-extrabold truncate">${esc(ex.name)}</p>
+              <p class="text-[11px] text-slate-400">${esc(ex.equipment)} • ${isPrimary ? 'Primary' : 'Secondary'} • ${esc(ex.difficulty)}</p>
+            </div>
+            <div class="flex items-center gap-1.5 flex-shrink-0">
+              <button onclick="openExerciseDetailModal('${ex.id}')" class="px-3 py-1.5 rounded-full bg-gray-100 dark:bg-charcoal-800 text-xs font-bold">Form</button>
+              <button onclick="${action}" class="px-3 py-1.5 rounded-full bg-volt-400 text-charcoal-950 text-xs font-extrabold">${isDay ? '+ Add' : '+ Plan'}</button>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    /*************************************************************************
+     * 10c. CREATE CUSTOM EXERCISE
+     *************************************************************************/
+    let ceContext = { mode: 'library', day: null };
+    let ceGoals = [];
+
+    function openCreateExerciseModal(mode = 'library', day = null) {
+      if (mode === 'day') {
+        const plan = db.planBuilder.draftPlan || db.activePlan;
+        if (!plan || !plan.days[day]) {
+          showToast('Generate a workout plan first.', 'error');
+          return;
+        }
+      }
+      ceContext = { mode, day };
+      ceGoals = [];
+      const opts = list => list.map(o => `<option value="${esc(o)}">${esc(o)}</option>`).join('');
+
+      openModal(`
+        <div class="space-y-4">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <span class="text-xs font-bold text-ice-400 uppercase">New Exercise</span>
+              <h3 class="text-xl font-extrabold mt-0.5">Create Exercise</h3>
+              <p class="text-xs text-slate-400 mt-0.5">${mode === 'day' ? `It will be added to <strong>${esc(day)}</strong> after saving.` : 'It will be saved to your exercise library.'}</p>
+            </div>
+            <button onclick="closeModal()" aria-label="Close" class="p-2 rounded-full bg-gray-100 dark:bg-charcoal-800 text-gray-700 dark:text-gray-200 hover:text-volt-500"><i data-lucide="x" class="w-4 h-4"></i></button>
+          </div>
+
+          <div>
+            <label class="ce-label" for="ce-name">Exercise name</label>
+            <input id="ce-name" class="ce-input" type="text" maxlength="80" placeholder="e.g. Cable Crossover" />
+          </div>
+
+          <div class="ce-grid">
+            <div>
+              <label class="ce-label" for="ce-category">Muscle group</label>
+              <select id="ce-category" class="ce-select">${opts(EXERCISE_CATEGORIES.filter(c => c !== 'All'))}</select>
+            </div>
+            <div>
+              <label class="ce-label" for="ce-equipment">Equipment</label>
+              <select id="ce-equipment" class="ce-select">${opts(EQUIPMENT_TYPES)}</select>
+            </div>
+          </div>
+
+          <div class="ce-grid">
+            <div>
+              <label class="ce-label" for="ce-difficulty">Difficulty</label>
+              <select id="ce-difficulty" class="ce-select">${opts(LEVELS_LIST)}</select>
+            </div>
+            <div>
+              <label class="ce-label" for="ce-setsreps">Recommended sets × reps</label>
+              <input id="ce-setsreps" class="ce-input" type="text" placeholder="e.g. 3 sets × 10–12 reps" />
+            </div>
+          </div>
+
+          <div class="ce-grid">
+            <div>
+              <label class="ce-label" for="ce-target">Primary target</label>
+              <input id="ce-target" class="ce-input" type="text" placeholder="e.g. Pectoralis Major" />
+            </div>
+            <div>
+              <label class="ce-label" for="ce-secondary">Secondary muscles</label>
+              <input id="ce-secondary" class="ce-input" type="text" placeholder="e.g. Triceps, Front Delts" />
+            </div>
+          </div>
+
+          <div>
+            <span class="ce-label">Goals</span>
+            <div class="ce-chips">
+              ${GOALS_LIST.map(g => `<button type="button" class="ce-chip" data-goal="${esc(g)}" onclick="toggleCustomGoal(this)">${esc(g)}</button>`).join('')}
+            </div>
+          </div>
+
+          <div>
+            <label class="ce-label" for="ce-steps">How to perform (one step per line)</label>
+            <textarea id="ce-steps" class="ce-textarea" placeholder="Press Enter for the next step"></textarea>
+          </div>
+          <div>
+            <label class="ce-label" for="ce-instructions">Execution instructions</label>
+            <textarea id="ce-instructions" class="ce-textarea" placeholder="Press Enter for the next point"></textarea>
+          </div>
+          <div>
+            <label class="ce-label" for="ce-mistakes">Common mistakes to avoid</label>
+            <textarea id="ce-mistakes" class="ce-textarea" placeholder="Press Enter for the next point"></textarea>
+          </div>
+          <div>
+            <label class="ce-label" for="ce-video">YouTube form video (optional)</label>
+            <input id="ce-video" class="ce-input" type="text" placeholder="https://www.youtube.com/watch?v=..." />
+          </div>
+
+          <p id="ce-error" class="ce-error" role="alert"></p>
+          <div class="ce-actions">
+            <button onclick="closeModal()" class="px-4 py-2.5 rounded-full text-xs font-bold text-gray-400">Cancel</button>
+            <button onclick="saveCustomExercise()" class="btn-primary px-6 py-2.5 text-xs font-bold">Save Exercise</button>
+          </div>
+        </div>
+      `);
+      bindListTextareas();
+    }
+
+    // Auto list behaviour: numbered steps (1. 2. 3.) or bullets (•).
+    function listMarker(numbered, n) {
+      return numbered ? `${n}. ` : '• ';
+    }
+
+    function enableListTyping(ta, numbered) {
+      if (!ta) return;
+      ta.addEventListener('focus', () => {
+        if (!ta.value.trim()) ta.value = listMarker(numbered, 1);
+        ta.setSelectionRange(ta.value.length, ta.value.length);
+      });
+      ta.addEventListener('keydown', e => {
+        if (e.key !== 'Enter' || e.shiftKey) return;
+        e.preventDefault();
+        const caret = ta.selectionStart;
+        const lineStart = ta.value.slice(0, caret).lastIndexOf('\n') + 1;
+        const line = ta.value.slice(lineStart, caret);
+        const marker = numbered ? /^\d+\. $/ : /^• $/;
+
+        // Enter on an empty item ends the list
+        if (marker.test(line)) {
+          ta.setRangeText('', lineStart, caret, 'end');
+          return;
+        }
+        const before = ta.value.slice(0, caret);
+        const filled = before.split('\n').filter(l => l.trim()).length;
+        ta.setRangeText('\n' + listMarker(numbered, filled + 1), caret, ta.selectionEnd, 'end');
+      });
+    }
+
+    function bindListTextareas() {
+      enableListTyping(document.getElementById('ce-steps'), true);
+      enableListTyping(document.getElementById('ce-instructions'), false);
+      enableListTyping(document.getElementById('ce-mistakes'), false);
+    }
+
+    // Strip list markers ("1. ", "• ", "- ") and empty lines before saving.
+    function cleanLines(id) {
+      return document.getElementById(id).value
+        .split('\n')
+        .map(l => l.replace(/^\s*(\d+\.|•|-|\*)\s*/, '').trim())
+        .filter(Boolean);
+    }
+
+    function toggleCustomGoal(btn) {
+      const goal = btn.dataset.goal;
+      const i = ceGoals.indexOf(goal);
+      if (i >= 0) ceGoals.splice(i, 1);
+      else ceGoals.push(goal);
+      btn.classList.toggle('is-on', i < 0);
+    }
+
+    function parseYouTubeId(url) {
+      const m = String(url || '').match(/(?:v=|youtu\.be\/|embed\/)([A-Za-z0-9_-]{11})/);
+      return m ? m[1] : '';
+    }
+
+    function saveCustomExercise() {
+      const get = id => document.getElementById(id).value.trim();
+      const fail = msg => { document.getElementById('ce-error').textContent = msg; };
+
+      const name = get('ce-name');
+      const target = get('ce-target');
+      const steps = cleanLines('ce-steps');
+      const videoRaw = get('ce-video');
+      const videoId = parseYouTubeId(videoRaw);
+
+      if (!name) return fail('Enter an exercise name.');
+      if (EXERCISE_DB.some(e => e.name.toLowerCase() === name.toLowerCase())) return fail('An exercise with this name already exists.');
+      if (!target) return fail('Enter the primary target muscle.');
+      if (steps.length === 0) return fail('Add at least one step under How to perform.');
+      if (videoRaw && !videoId) return fail('Enter a valid YouTube link or leave it empty.');
+
+      const ex = {
+        id: 'custom_' + Date.now(),
+        name,
+        category: get('ce-category'),
+        equipment: get('ce-equipment'),
+        difficulty: get('ce-difficulty'),
+        target,
+        secondary: get('ce-secondary') || 'None',
+        setsReps: get('ce-setsreps') || '3 sets × 8–12 reps',
+        steps,
+        instructions: cleanLines('ce-instructions').join('\n') || steps.join(' '),
+        mistakes: cleanLines('ce-mistakes').join('\n') || 'None noted',
+        goals: [...ceGoals],
+        ...(videoId ? { videoId } : {})
+      };
+
+      db.customExercises = db.customExercises || [];
+      db.customExercises.push(ex);
+      syncCustomExercises();
+      saveDB();
+
+      if (ceContext.mode === 'day') {
+        confirmAddExerciseToPlanDay(ex.id, ceContext.day);
+      } else {
+        closeModal();
+        renderExerciseLibrary();
+        showToast(`Created ${name}`, 'success');
+      }
+    }
+
+    function deleteCustomExercise(exId) {
+      if (!confirm('Delete this custom exercise? Plans that already include it keep their copy.')) return;
+      db.customExercises = (db.customExercises || []).filter(e => e.id !== exId);
+      db.favorites = db.favorites.filter(id => id !== exId);
+      syncCustomExercises();
+      saveDB();
+      closeModal();
+      renderExerciseLibrary();
+      showToast('Custom exercise deleted.', 'info');
+    }
+
+    function confirmAddExerciseToPlanDay(exId, day, keepOpen = false) {
       const ex = EXERCISE_DB.find(e => e.id === exId);
       const targetPlan = db.planBuilder.draftPlan || db.activePlan;
       if (!ex || !targetPlan) return;
@@ -2356,7 +2726,8 @@
         reps: '10–12'
       });
       saveDB();
-      closeModal();
+      if (!keepOpen) closeModal();
+      renderWorkoutPlanBuilder();
       showToast(`Added ${ex.name} to ${day}!`, 'success');
     }
 
@@ -2647,8 +3018,7 @@
       const ctx = document.getElementById('bodyProgressChart');
       if (!ctx) return;
       if (bodyProgressChartInstance) bodyProgressChartInstance.destroy();
-      const isDark = db.settings.theme === 'dark' || document.documentElement.classList.contains('dark');
-
+      
       bodyProgressChartInstance = new Chart(ctx, {
         type: 'line',
         data: {
@@ -2670,12 +3040,12 @@
           plugins: { legend: { display: false } },
           scales: {
             y: {
-              grid: { color: isDark ? 'rgba(229, 231, 235, 0.16)' : 'rgba(17, 24, 39, 0.08)' },
-              ticks: { color: isDark ? '#E5E7EB' : '#4B5563', font: { size: 11 } }
+              grid: { color: () => chartGridColor() },
+              ticks: { color: () => chartTextColor(), font: { size: 11 } }
             },
             x: {
               grid: { display: false },
-              ticks: { color: isDark ? '#E5E7EB' : '#4B5563', font: { size: 11 } }
+              ticks: { color: () => chartTextColor(), font: { size: 11 } }
             }
           }
         }
@@ -3746,4 +4116,5 @@
       ensureTabFooters();
       initializeStyleHooks();
       updateInstallControls();
+      refreshChartThemes();
     });

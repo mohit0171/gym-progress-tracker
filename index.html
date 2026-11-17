@@ -246,7 +246,7 @@
               </div>
               <span class="unit-weight-label sticker-badge self-start">Volume (kg)</span>
             </div>
-            <div class="h-64 w-full relative">
+            <div class="app-chart h-64 w-full relative">
               <canvas id="dashboardVolumeChart"></canvas>
             </div>
           </div>
@@ -449,6 +449,13 @@
 
           <!-- Category Pills -->
           <div id="lib-category-pills" class="flex items-center gap-2 overflow-x-auto pb-1"></div>
+
+          <!-- Add Exercise (muscle picker) -->
+          <div class="add-exercise-row">
+            <button type="button" onclick="openCreateExerciseModal('library')" class="add-exercise-btn">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Exercise
+            </button>
+          </div>
         </div>
 
         <!-- Exercise Cards Grid -->
@@ -612,7 +619,7 @@
                   <div id="trend-range-pills" class="flex gap-1"></div>
                 </div>
               </div>
-              <div class="h-64 w-full relative">
+              <div class="app-chart h-64 w-full relative">
                 <canvas id="bodyProgressChart"></canvas>
               </div>
             </div>
@@ -1002,44 +1009,4 @@
   <script src="app.js"></script>
 </body>
 </html>
-<script>
-/**
- * Theme Toggle Function
- * Toggles between light and dark mode, persists preference to localStorage
- */
-function toggleTheme() {
-  const html = document.documentElement;
-  const themeLabel = document.getElementById('sidebar-theme-label');
-
-  if (html.classList.contains('dark')) {
-    html.classList.remove('dark');
-    localStorage.setItem('theme', 'light');
-    if (themeLabel) themeLabel.textContent = 'Dark Mode';
-  } else {
-    html.classList.add('dark');
-    localStorage.setItem('theme', 'dark');
-    if (themeLabel) themeLabel.textContent = 'Light Mode';
-  }
-}
-
-// Check for saved theme preference or system preference
-document.addEventListener('DOMContentLoaded', function() {
-  const savedTheme = localStorage.getItem('theme');
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-  // Use saved preference, fall back to system preference
-  const themeToApply = savedTheme ? savedTheme : (prefersDark ? 'dark' : 'light');
-
-  if (themeToApply === 'dark') {
-    document.documentElement.classList.add('dark');
-  }
-
-  // Listen for system theme changes
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-    if (!localStorage.getItem('theme')) {
-      const newTheme = e.matches ? 'dark' : 'light';
-      document.documentElement.classList.toggle('dark', newTheme === 'dark');
-    }
-  });
-});
-</script>
+<!-- Theme is managed by app.js (db.settings.theme) -->

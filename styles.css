@@ -1680,3 +1680,143 @@ html.dark #printable-report-area .report-table-wrap {
 #welcome-hero-banner button.btn-primary {
   color: #FFFFFF !important;
 }
+
+/* Tappable muscle picker (Add Exercise by muscle) */
+.mf-pick { cursor: pointer; transition: fill 0.2s ease; }
+.mf-pick:hover { fill: var(--mf-secondary); }
+.mf-pick.is-chosen { fill: var(--mf-primary); stroke: var(--text-primary); stroke-width: 1; }
+
+
+/* Add Exercise buttons: theme-aware via CSS variables (light + dark) */
+.add-exercise-row {
+  display: flex;
+  justify-content: flex-end;
+}
+.add-exercise-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 38px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--border-subtle);
+  background-color: var(--theme-accent-soft);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.15s ease;
+}
+.add-exercise-btn i,
+.add-exercise-btn svg {
+  color: var(--color-accent);
+  stroke: var(--color-accent);
+}
+.add-exercise-btn:hover {
+  background-color: var(--theme-accent-glow);
+}
+.add-exercise-btn:active {
+  transform: scale(0.98);
+}
+.add-exercise-btn:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+.add-exercise-btn--block {
+  width: 100%;
+}
+@media (max-width: 640px) {
+  .add-exercise-row .add-exercise-btn {
+    width: 100%;
+  }
+}
+
+
+/* Create Exercise form (theme-aware) */
+.ce-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+.ce-input,
+.ce-select,
+.ce-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--border-subtle);
+  background-color: var(--bg-elevated);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: inherit;
+}
+.ce-select option { background-color: var(--bg-surface); color: var(--text-primary); }
+.ce-textarea { min-height: 84px; resize: vertical; line-height: 1.5; }
+.ce-input:focus,
+.ce-select:focus,
+.ce-textarea:focus {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+.ce-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+@media (min-width: 640px) { .ce-grid { grid-template-columns: 1fr 1fr; } }
+.ce-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.ce-chip {
+  padding: 7px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border-subtle);
+  background-color: var(--bg-elevated);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.ce-chip.is-on {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--text-inverse);
+}
+.ce-error { min-height: 16px; font-size: 12px; font-weight: 700; color: #e11d48; }
+.ce-actions { display: flex; justify-content: flex-end; align-items: center; gap: 10px; }
+.custom-badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  background-color: var(--theme-accent-soft);
+  color: var(--color-accent);
+  border: 1px solid var(--border-subtle);
+}
+
+
+/* Shared chart wrapper: both dashboard and progress charts use this class.
+   Neutralises any inherited opacity, filter or animation from parent cards. */
+.app-chart {
+  position: relative;
+  isolation: isolate;
+  opacity: 1 !important;
+  filter: none !important;
+  animation: none !important;
+}
+
+
+/* Bulleted lines on the exercise detail screen */
+.text-bullets {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+.text-bullets li { display: flex; gap: 8px; }
+.text-bullets li::before { content: '•'; color: var(--color-accent); font-weight: 800; }

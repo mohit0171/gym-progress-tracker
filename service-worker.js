@@ -3,7 +3,7 @@
 //  - Navigations: network first, fall back to the cached shell when offline.
 //  - Other GETs (same-origin files and CDN scripts/styles/fonts): stale-while-revalidate.
 //    Opaque cross-origin responses (no-cors CDN scripts) are cached too, since they cannot be inspected.
-const CACHE_NAME = 'wegogym-shell-v10';
+const CACHE_NAME = 'wegogym-shell-v11';
 
 // Relative to this file so the app works from any sub-path.
 const SHELL = [
